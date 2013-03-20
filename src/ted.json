@@ -1,0 +1,12 @@
+[
+{
+	"streamformat": "mp4",
+	"stream": {"url": "http://video.ted.com/talks/podcast/DanGilbert_2004_480.mp4"},
+	"title": "Dan Gilbert asks, Why are we happy?"
+},
+{
+	"streamformat": "mp4",
+	"stream": {"url": "http://video.ted.com/talks/podcast/CraigVenter_2008_480.mp4"},
+	"title": "Craig Vetner Synthetic Life"
+}
+]
