@@ -34,8 +34,12 @@ sub main()
         ' Video selected
         if msg.isListItemSelected()
             ' Switch to video
+            row = msg.GetIndex()
+            selection = msg.GetData()
+
             grid_screen.Close()
-            watch_video(feed, msg.GetIndex(), splash)
+            ' NB: WRONG, needs to take into account the row and use watched/unwatched arrays
+            watch_video(feed, selection, splash)
 
             ' Return to grid
             grid_screen = get_grid_screen(message_port, feed)
