@@ -13,17 +13,28 @@ output = []
 
 for story in data['list']['story']:
     item = {
-        'title': story['title']['$text'],
-        'streamformat': 'mp4',
-        'stream': {
-            'url': ''
+        'Id': story['id'],
+        'Title': story['title']['$text'],
+        'Description': story['miniTeaser']['$text'],
+        'SDPosterUrl': None,
+        'HDPosterUrl': None,
+        #'Length': 0,
+        #'ReleaseDate': '',
+        'StreamFormat': 'mp4',
+        'Stream': {
+            'Url': None
         }
     }
+
+    thumbnail_url = story['thumbnail']['medium']['$text']
+
+    item['SDPosterUrl'] = thumbnail_url.replace('s=13', 's=3')
+    item['HDPosterUrl'] = thumbnail_url.replace('s=13', 's=4')
 
     # Audio url: http://pd.npr.org/npr-mp4/npr/asc/2013/03/20130308_asc_hayes.mp4
     # Video url: http://pd.npr.org/npr-mp4/npr/ascvid/2013/03/20130308_ascvid_hayes-n-600000.mp4
     audio_url = story['audio'][0]['format']['mp4']['$text']
-    item['stream']['url'] = audio_url.replace('asc', 'ascvid').replace('.mp4', '-n-600000.mp4')
+    item['Stream']['Url'] = audio_url.replace('asc', 'ascvid').replace('.mp4', '-n-600000.mp4')
 
     output.append(item)
 

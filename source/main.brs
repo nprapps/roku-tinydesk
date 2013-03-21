@@ -158,52 +158,65 @@ function find_index(current_url, feed)
 end function
 
 function seek_to(video_player, splash, feed, index, additional_message = "")
-  message = additional_message + "Next: " + feed[index].title
-  splash_message(splash, message)
-  video_player.SetNext(index)
-  video_player.Play()
+    ' Jump to a certain point in the video
+    message = additional_message + "Next: " + feed[index].title
+    splash_message(splash, message)
+    video_player.SetNext(index)
+    video_player.Play()
 end function
 
 function mark_as_watched(feed, index)
-  RegWrite(feed[index].title, "watched", "feedtv2")
+    ' Mark a video watched in the registry
+    RegWrite(feed[index].Id, "watched", "nproku")
 end function
 
 function is_watched(feed, index)
-  read = RegRead(feed[index].title, "feedtv2")
-  return read = "watched"
+    ' Check the registry to see if a feed item has been watched
+    read = RegRead(feed[index].Id, "nproku")
+
+    return read = "watched"
 end function
 
 function find_next_unwatched(feed, index)
-  for i = index to feed.Count() - 1
-    if not is_watched(feed, i)
-      return i
-    end if
-  end for
-  return -1
+    ' Find the first unwatched video in the feed
+    for i = index to feed.Count() - 1
+        if not is_watched(feed, i)
+            return i
+        end if
+    end for
+    
+    return -1
 end function
 
 function get_grid_screen(message_port, feed)
-  grid_screen = CreateObject("roGridScreen")
-  grid_screen.SetMessagePort(message_port)
-  grid_screen.SetGridStyle("flat-landscape")
-  unwatched = []
-  watched = []
-  for i = 0 to feed.Count() - 1
-    if is_watched(feed, i)
-      watched.Push(feed[i])
-    else
-      unwatched.Push(feed[i])
-    end if
-  end for
-  titles = ["New","Previously viewed / skipped"]
-  grid_screen.SetupLists(2)
-  grid_screen.SetListNames(titles)
-  grid_screen.SetContentList(0,unwatched)
-  grid_screen.SetContentList(1,watched)
-  return grid_screen
+    ' Create the video grid from the video feed
+    grid_screen = CreateObject("roGridScreen")
+    grid_screen.SetMessagePort(message_port)
+    grid_screen.SetGridStyle("flat-landscape")
+    
+    unwatched = []
+    watched = []
+
+    for i = 0 to feed.Count() - 1
+        if is_watched(feed, i)
+            watched.Push(feed[i])
+        else
+            unwatched.Push(feed[i])
+        end if
+    end for
+
+    titles = ["New","Previously viewed / skipped"]
+    
+    grid_screen.SetupLists(2)
+    grid_screen.SetListNames(titles)
+    grid_screen.SetContentList(0,unwatched)
+    grid_screen.SetContentList(1,watched)
+    
+    return grid_screen
 end function
 
 function get_feed()
+    ' Parse the video feed
     json = BSJSON()
     data = ReadAsciiFile("pkg:/source/tinydesk.json") 
 
