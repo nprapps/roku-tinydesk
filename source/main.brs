@@ -13,7 +13,7 @@ sub main()
   
   gogogo = true
   grid_screen = null
-  next_index = find_next_unwatched(feed,0)
+  next_index = find_next_unwatched(feed, 0)
      
   while true
     if gogogo
@@ -204,8 +204,8 @@ function get_grid_screen(message_port, feed)
 end function
 
 function get_feed()
-  ' json = BSJSON()
-  ' return json.JsonDecode(ReadAsciiFile("pkg:/source/ted.json"))
-  mrss = NWM_MRSS("http://www.ted.com/themes/rss/id/72")
-  return mrss.GetEpisodes()
+    json = BSJSON()
+    data = ReadAsciiFile("pkg:/source/tinydesk.json") 
+
+    return json.JsonDecode(data)
 end function
