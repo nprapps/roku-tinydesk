@@ -18,7 +18,7 @@ for story in data['list']['story']:
         'Description': story['miniTeaser']['$text'],
         'SDPosterUrl': None,
         'HDPosterUrl': None,
-        #'Length': 0,
+        'Length': story['multimedia'][0]['duration']['$text'],
         #'ReleaseDate': '',
         'StreamFormat': 'mp4',
         'Stream': {
@@ -26,15 +26,13 @@ for story in data['list']['story']:
         }
     }
 
-    thumbnail_url = story['thumbnail']['medium']['$text']
+    alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
 
-    item['SDPosterUrl'] = thumbnail_url.replace('s=13', 's=3')
-    item['HDPosterUrl'] = thumbnail_url.replace('s=13', 's=4')
+    item['SDPosterUrl'] = alt_image_url + '?s=2'
+    item['HDPosterUrl'] = alt_image_url + '?s=3'
 
-    # Audio url: http://pd.npr.org/npr-mp4/npr/asc/2013/03/20130308_asc_hayes.mp4
-    # Video url: http://pd.npr.org/npr-mp4/npr/ascvid/2013/03/20130308_ascvid_hayes-n-1200000.mp4
-    audio_url = story['audio'][0]['format']['mp4']['$text']
-    item['Stream']['Url'] = audio_url.replace('asc', 'ascvid').replace('.mp4', '-n-1200000.mp4')
+    video_url = story['multimedia'][0]['format']['mp4']['$text']
+    item['Stream']['Url'] = video_url #.replace('asc', 'ascvid').replace('.mp4', '-n-1200000.mp4')
 
     output.append(item)
 

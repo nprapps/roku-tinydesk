@@ -32,12 +32,10 @@ sub main()
         msg = wait(0, message_port)
 
         ' Video selected
-        if msg.isScreenClosed()
-            exit while
-        else if msg.isListItemSelected()
+        if msg.isListItemSelected()
             ' Switch to video
             grid_screen.Close()
-            watch_video(feed, msg.GetData(), splash)
+            watch_video(feed, msg.GetIndex(), splash)
 
             ' Return to grid
             grid_screen = get_grid_screen(message_port, feed)
@@ -48,7 +46,7 @@ sub main()
 end sub
 
 ' Watch a video from the feed
-function watch_video(feed, index, splash)
+function watch_video(feed, feed_index, splash)
     message_port = splash.GetMessagePort()
 
     video_canvas = CreateObject("roImageCanvas")
@@ -57,32 +55,29 @@ function watch_video(feed, index, splash)
     video_player = CreateObject("roVideoPlayer")
     video_player.SetMessagePort(message_port)
     video_player.SetDestinationRect(video_canvas.GetCanvasRect())
-    video_player.SetContentList(feed)
+    video_player.SetContentList([feed[feed_index]])
     video_player.SetPositionNotificationPeriod(1)
 
-    m.paused = false
-    m.position = 0
+    paused = false
+    position = 0
     current_url = ""
-    current_index = invalid
+    started = False
 
-    video_player.SetNext(index)
+    video_player.SetNext(0)
     video_player.Play()
 
     while true
         ' Wait for an event
         msg = wait(0, message_port)
 
-        if msg.isScreenClosed()
-            exit while
-        else if msg.isStreamStarted()
+        if msg.isStreamStarted()
             ' once the video starts, clear out the canvas so it doesn't cover the video
             ' this baby gets run every time you seek forward, so beware
             splash_clear_background(splash)
-            current_url = msg.GetInfo()["Url"]
-            current_index = find_index(current_url, feed)
+            started = True
         else if msg.isPlaybackPosition()
-            m.position = msg.GetIndex()
-            if m.position > 2
+            position = msg.GetIndex()
+            if position > 2
                 ' clear the splash after a few seconds
                 splash_clear(splash)
             end if
@@ -97,40 +92,47 @@ function watch_video(feed, index, splash)
                 video_player.Seek(m.position * 1000 + 60 * 1000)
             ' LEFT -- go to previous video in feed
             else if index = 4
-                next_index = current_index - 1
+                next_index = feed_index - 1
                 
                 if next_index = -1
                     next_index = feed.Count() - 1
                 end if
+
+                feed_index = next_index
             
-                seek_to(video_player, splash, feed, next_index)
+                seek_to(video_player, splash, feed, feed_index)
             ' RIGHT -- go to next video in feed
             else if index = 5
-                next_index = current_index + 1
+                next_index = feed_index + 1
                 
                 if next_index = feed.Count()
                     next_index = 0
                 end if
+
+                feed_index = next_index
             
-                seek_to(video_player, splash, feed, next_index)
+                seek_to(video_player, splash, feed, feed_index)
             ' OK -- go to next video in feed and mark as watched
             else if index = 6
-                next_index = current_index + 1
+                next_index = feed_index + 1
 
                 if next_index = feed.Count()
                     next_index = 0
                 end if
 
-                mark_as_watched(feed, current_index)
-                seek_to(video_player, splash, feed, next_index, "Skipped!                                                                                                                                                                                                                                                                ")      
+                mark_as_watched(feed, feed_index)
+
+                feed_index = next_index
+
+                seek_to(video_player, splash, feed, feed_index, "Skipped!                                                                                                                                                                                                                                                                ")      
             ' PAUSE / PLAY
             else if index = 13
-                if m.paused
+                if paused
                     video_player.Resume()
-                    m.paused = false
+                    paused = false
                 else
                     video_player.Pause()
-                    m.paused = true
+                    paused = true
                 end if
             end if
         end if
@@ -169,9 +171,10 @@ end function
 
 ' Jump to a certain point in the video
 function seek_to(video_player, splash, feed, index, additional_message = "")
-    message = additional_message + "Next: " + feed[index].title
+    message = additional_message + "Next: " + feed[index].Title
     splash_message(splash, message)
-    video_player.SetNext(index)
+    video_player.SetContentList([feed[index]])
+    video_player.SetNext(0)
     video_player.Play()
 end function
 
@@ -219,8 +222,8 @@ function get_grid_screen(message_port, feed)
     
     grid_screen.SetupLists(2)
     grid_screen.SetListNames(titles)
-    grid_screen.SetContentList(0,unwatched)
-    grid_screen.SetContentList(1,watched)
+    grid_screen.SetContentList(0, unwatched)
+    grid_screen.SetContentList(1, watched)
     
     return grid_screen
 end function
