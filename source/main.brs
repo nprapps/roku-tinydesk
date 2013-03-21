@@ -32,7 +32,9 @@ sub main()
         msg = wait(0, message_port)
 
         ' Video selected
-        if msg.isListItemSelected()
+        if msg.isScreenClosed()
+            exit while
+        else if msg.isListItemSelected()
             ' Switch to video
             grid_screen.Close()
             watch_video(feed, msg.GetData(), splash)
@@ -70,7 +72,9 @@ function watch_video(feed, index, splash)
         ' Wait for an event
         msg = wait(0, message_port)
 
-        if msg.isStreamStarted()
+        if msg.isScreenClosed()
+            exit while
+        else if msg.isStreamStarted()
             ' once the video starts, clear out the canvas so it doesn't cover the video
             ' this baby gets run every time you seek forward, so beware
             splash_clear_background(splash)

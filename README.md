@@ -7,3 +7,16 @@ Setup
 -----
 
 Set `NPR_API_KEY` in your `.bash_profile`.
+
+```
+mkvirtualenv nproku
+pip install requirements.txt
+```
+
+Generate JSON feed
+------------------
+
+```
+workon nproku
+python fetch_feed.py
+```
