@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import json
+import os
 
 import requests
 
-response = requests.get('http://api.npr.org/query?id=92071316&apiKey=MDEwNjM4Njk3MDEzNTY2Mzk0MzlkY2FkYQ001&output=json')
+response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json' % os.environ['NPR_API_KEY'])
 
 data = response.json() 
 
