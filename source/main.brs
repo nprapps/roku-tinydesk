@@ -74,15 +74,15 @@ function watch_video(feed, index, splash)
             ' once the video starts, clear out the canvas so it doesn't cover the video
             ' this baby gets run every time you seek forward, so beware
             splash_clear_background(splash)
-            current_url = msg.GetInfo()["url"]
+            current_url = msg.GetInfo()["Url"]
             current_index = find_index(current_url, feed)
-        elseif msg.isPlaybackPosition()
+        else if msg.isPlaybackPosition()
             m.position = msg.GetIndex()
             if m.position > 2
                 ' clear the splash after a few seconds
                 splash_clear(splash)
             end if
-        elseif msg.isRemoteKeyPressed()
+        else if msg.isRemoteKeyPressed()
             index = msg.GetIndex()
 
             ' UP / BACK -- go to grid screen
@@ -112,6 +112,7 @@ function watch_video(feed, index, splash)
             ' OK -- go to next video in feed and mark as watched
             else if index = 6
                 next_index = current_index + 1
+
                 if next_index = feed.Count()
                     next_index = 0
                 end if
@@ -154,11 +155,9 @@ function find_index(current_url, feed)
     i = 0
 
     for each item in feed
-        for each stream in item.streams
-            if stream.url = current_url
-                return i
-            end if
-        end for
+        if item.Stream.Url = current_url
+            return i
+        end if
 
         i = i + 1
     end for

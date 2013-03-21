@@ -32,9 +32,9 @@ for story in data['list']['story']:
     item['HDPosterUrl'] = thumbnail_url.replace('s=13', 's=4')
 
     # Audio url: http://pd.npr.org/npr-mp4/npr/asc/2013/03/20130308_asc_hayes.mp4
-    # Video url: http://pd.npr.org/npr-mp4/npr/ascvid/2013/03/20130308_ascvid_hayes-n-600000.mp4
+    # Video url: http://pd.npr.org/npr-mp4/npr/ascvid/2013/03/20130308_ascvid_hayes-n-1200000.mp4
     audio_url = story['audio'][0]['format']['mp4']['$text']
-    item['Stream']['Url'] = audio_url.replace('asc', 'ascvid').replace('.mp4', '-n-600000.mp4')
+    item['Stream']['Url'] = audio_url.replace('asc', 'ascvid').replace('.mp4', '-n-1200000.mp4')
 
     output.append(item)
 
