@@ -6,6 +6,8 @@ import os
 from dateutil.parser import parse
 import requests
 
+BITRATES = [200000, 500000, 1000000, 2000000]
+
 response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&numResults=10' % os.environ['NPR_API_KEY'])
 
 data = response.json() 
@@ -24,9 +26,11 @@ for story in data['list']['story']:
         'Length': story['multimedia'][0]['duration']['$text'],
         'ReleaseDate': None,
         'StreamFormat': 'mp4',
-        'Stream': {
-            'Url': None
-        }
+        'StreamBitrates': [],
+        'StreamUrls': [],
+        'StreamQualities': [],
+        'IsHD': True,
+        'HDBranded': True
     }
 
     alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
@@ -42,7 +46,15 @@ for story in data['list']['story']:
     item['ReleaseDate'] = dt.strftime('%B %d, %Y') 
 
     video_url = story['multimedia'][0]['format']['mp4']['$text']
-    item['Stream']['Url'] = video_url #.replace('asc', 'ascvid').replace('.mp4', '-n-1200000.mp4')
+    
+    for bitrate in BITRATES:
+        item['StreamBitrates'].append(int(bitrate / 1024))
+        item['StreamUrls'].append(video_url.replace('-n', '-n-%i' % bitrate))
+        item['StreamQualities'].append('SD')
+
+    # The last item is full resolution 
+    item['StreamUrls'][-1] = video_url
+    item['StreamQualities'][-1] = 'HD'
 
     output.append(item)
 
