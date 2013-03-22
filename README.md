@@ -19,7 +19,7 @@ export ROKU_IP="10.0.1.2"
 
 You need a superuser API key for this. Sorry, non-NPR people looking at this code.
 
-Lastly, install the Python requirements:
+Install the Python requirements:
 
 ```
 $ mkvirtualenv nproku
@@ -39,7 +39,7 @@ $ python fetch_feed.py
 Package & Deploy
 ----------------
 
-Do it!
+To package up the code and deploy it to your Roku:
 
 ```
 $ ./build.sh
