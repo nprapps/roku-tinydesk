@@ -18,7 +18,7 @@ Function showGridScreen(screen as Object) as Integer
     m.UNWATCHED = 0
     m.WATCHED = 1
 
-    m.titles = ["New", "Watched / skipped"]
+    m.titles = ["New", "Watched"]
     m.lists = []
 
     screen.SetupLists(m.titles.Count())

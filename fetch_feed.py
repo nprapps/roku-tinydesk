@@ -6,7 +6,7 @@ import os
 from dateutil.parser import parse
 import requests
 
-response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&numResults=50' % os.environ['NPR_API_KEY'])
+response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&numResults=10' % os.environ['NPR_API_KEY'])
 
 data = response.json() 
 

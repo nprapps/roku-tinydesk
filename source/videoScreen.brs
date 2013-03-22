@@ -7,13 +7,14 @@ Function showVideoScreen(feedItem As Object) as Boolean
 
     watched = false
 
+    position = loadPosition(feedItem)
+    feedItem.PlayStart = position
+
+    print "Video playback will begin at: " feedItem.PlayStart
+
     screen.SetPositionNotificationPeriod(1)
     screen.SetContent(feedItem)
     screen.Show()
-
-    position = loadPosition(feedItem)
-    ' TODO: why doesn't this work?
-    screen.seek(position * 1000)
 
     while true
         msg = wait(0, port)
