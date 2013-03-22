@@ -6,8 +6,6 @@ Any experiment. Borrows code from the Roku example apps and from [https://github
 Setup
 -----
 
-Get the [Roku SDK](http://www.roku.com/developer).
-
 Put your Roku into [Dev Mode](http://sdkdocs.roku.com/display/RokuSDKv48/Developer+Guide#DeveloperGuide-71EnablingDevelopmentModeonyourbox).
 
 Set the following variables in your `.bash_profile`:
@@ -17,7 +15,7 @@ export NPR_API_KEY="SUPERUSER_KEY_HERE"
 export ROKU_IP="10.0.1.2"
 ```
 
-You need a superuser API key for this. Sorry, non-NPR people looking at this code.
+You need a superuser API key for this. Sorry, non-NPR people looking at this code. Your Roku will tell you its IP address when you put it into Dev Mode.
 
 Install the Python requirements:
 
