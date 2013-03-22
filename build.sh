@@ -1,6 +1,5 @@
 #!/bin/sh
 
-ROKU_IP="10.0.1.2"
 ZIP_NAME="nproku.zip"
 
 curl -s -S -F "mysubmit=Delete" -F "archive=" -F "passwd=" http://$ROKU_IP/plugin_install
