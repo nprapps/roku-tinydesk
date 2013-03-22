@@ -5,13 +5,15 @@ import os
 
 import requests
 
-response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json' % os.environ['NPR_API_KEY'])
+response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&numResults=50' % os.environ['NPR_API_KEY'])
 
 data = response.json() 
 
 output = []
 
 for story in data['list']['story']:
+    print story['title']['$text']
+
     item = {
         'Id': story['id'],
         'Title': story['title']['$text'],
@@ -35,6 +37,8 @@ for story in data['list']['story']:
     item['Stream']['Url'] = video_url #.replace('asc', 'ascvid').replace('.mp4', '-n-1200000.mp4')
 
     output.append(item)
+
+print 'Saving %i concerts' % len(output)
 
 with open('source/tinydesk.json', 'w') as f:
     json.dump(output, f, indent=4)
