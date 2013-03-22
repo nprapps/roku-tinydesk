@@ -1,53 +1,17 @@
 ' nprapps Roku app
 
-' TODO: when to mark as watched? when you hit ok? when you hit next?
+Sub Main()
 
-' Main function
-sub main()
-    message_port = CreateObject("roMessagePort")
-  
-    splash = CreateObject("roImageCanvas")
-    splash.SetMessagePort(message_port)
-    splash_message(splash, "Press the back or up button for the list of videos.                                                                                                                                Press OK if you're bored and want to skip ahead.")
-    splash.Show()
-  
-    feed = get_feed()
-  
-    start_now = true
-    grid_screen = null
-    next_index = find_next_unwatched(feed, 0)
-     
-    ' Main loop
-    while true
-        if start_now 
-            start_now = false
-            watch_video(feed, next_index, splash) 
+    screen = preShowGridScreen()
 
-            ' Go to grid
-            grid_screen = get_grid_screen(message_port, feed)
-            grid_screen.Show()
-        end if
+    if screen=invalid then
+        print "unexpected error in preShowGridScreen"
+        return
+    end if
 
-        ' Wait for an event
-        msg = wait(0, message_port)
+    showGridScreen(screen)
 
-        ' Video selected
-        if msg.isListItemSelected()
-            ' Switch to video
-            row = msg.GetIndex()
-            selection = msg.GetData()
-
-            grid_screen.Close()
-            ' NB: WRONG, needs to take into account the row and use watched/unwatched arrays
-            watch_video(feed, selection, splash)
-
-            ' Return to grid
-            grid_screen = get_grid_screen(message_port, feed)
-            grid_screen.Show()
-        end if    
-    end while
-  
-end sub
+End Sub
 
 ' Watch a video from the feed
 function watch_video(feed, feed_index, splash)
@@ -205,37 +169,3 @@ function find_next_unwatched(feed, start_index)
     return -1
 end function
 
-' Create the video grid from the video feed
-function get_grid_screen(message_port, feed)
-    grid_screen = CreateObject("roGridScreen")
-    grid_screen.SetMessagePort(message_port)
-    grid_screen.SetGridStyle("flat-landscape")
-    
-    unwatched = []
-    watched = []
-
-    for i = 0 to feed.Count() - 1
-        if is_watched(feed, i)
-            watched.Push(feed[i])
-        else
-            unwatched.Push(feed[i])
-        end if
-    end for
-
-    titles = ["New","Previously viewed / skipped"]
-    
-    grid_screen.SetupLists(2)
-    grid_screen.SetListNames(titles)
-    grid_screen.SetContentList(0, unwatched)
-    grid_screen.SetContentList(1, watched)
-    
-    return grid_screen
-end function
-
-' Parse the video feed
-function get_feed()
-    json = BSJSON()
-    data = ReadAsciiFile("pkg:/source/tinydesk.json") 
-
-    return json.JsonDecode(data)
-end function
