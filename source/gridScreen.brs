@@ -5,6 +5,9 @@ Function preShowGridScreen() As Object
     screen = CreateObject("roGridScreen")
     screen.SetMessagePort(port)
 
+    screen.SetGridStyle("flat-landscape")
+    screen.SetDisplayMode("photo-fit")
+
     return screen
 
 End Function
@@ -17,8 +20,6 @@ Function showGridScreen(screen as Object) as Integer
 
     m.titles = ["New", "Watched / skipped"]
     m.lists = []
-    m.lists[m.UNWATCHED] = []
-    m.lists[m.WATCHED] = []
 
     screen.SetupLists(m.titles.Count())
     screen.SetListNames(m.titles)
@@ -28,11 +29,7 @@ Function showGridScreen(screen as Object) as Integer
     screen.ShowMessage("Fetching videos...")
 
     feed = fetchFeed()
-    initLists(feed)
-
-    for i = 0 to m.titles.Count() - 1
-        screen.SetContentList(i, m.lists[i])
-    end for
+    initLists(screen, feed)
 
     screen.ClearMessage()
 
@@ -47,8 +44,14 @@ Function showGridScreen(screen as Object) as Integer
             if msg.isListItemSelected() then
                 selected_list = msg.GetIndex()
                 selected_item = msg.GetData()
+                feedItem = m.lists[selected_list][selected_item]
 
-                showVideoScreen(m.lists[selected_list][selected_item])
+                watched = showVideoScreen(feedItem)
+
+                if watched and selected_list <> m.WATCHED then
+                    mark_as_watched(feedItem)
+                    initLists(screen, feed)
+                end if
             else if msg.isScreenClosed() then
                 return -1
             end if
@@ -59,22 +62,48 @@ End Function
 
 ' Parse the video feed
 function fetchFeed()
+
     json = BSJSON()
     data = ReadAsciiFile("pkg:/source/tinydesk.json") 
 
     return json.JsonDecode(data)
+
 end function
 
 ' Initialize the video lists
-Function initLists(feed)
+Function initLists(screen, feed)
+    
+    for i = 0 to m.titles.Count() - 1
+        m.lists[i] = []
+    end for
 
-    for i = 0 to feed.Count() - 1
-        if is_watched(feed, i)
-            m.lists[m.WATCHED].Push(feed[i])
+    for each feedItem in feed
+        if is_watched(feedItem)
+            m.lists[m.WATCHED].Push(feedItem)
         else
-            m.lists[m.UNWATCHED].Push(feed[i])
+            m.lists[m.UNWATCHED].Push(feedItem)
         end if
+    end for
+   
+    for i = 0 to m.lists.Count() - 1
+        screen.SetContentList(i, m.lists[i])
     end for
 
 End Function
+
+' Mark a video watched in the registry
+function mark_as_watched(feedItem)
+
+    RegWrite(feedItem.Id + "_watched", "watched", "nproku")
+
+end function
+
+' Check the registry to see if a feed item has been watched
+function is_watched(feedItem)
+
+    read = RegRead(feedItem.Id + "_watched", "nproku")
+
+    return read = "watched"
+
+end function
 
