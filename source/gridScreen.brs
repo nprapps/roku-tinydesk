@@ -26,7 +26,7 @@ Function showGridScreen(screen as Object) as Integer
 
     screen.Show()
 
-    screen.ShowMessage("Fetching videos...")
+    screen.ShowMessage("Retrieving...")
 
     feed = fetchFeed()
     initLists(screen, feed)
