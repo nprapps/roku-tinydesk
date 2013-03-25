@@ -31,8 +31,15 @@ Function showVideoScreen(feedItem As Object) as Boolean
             else if msg.isFullResult()
                 watched = True
                 exit while
+            else if msg.isPartialResult()
+                ' If user watched more than 95% count video as watched
+                if position >= int(feedItem.Length * 0.95) then
+                    position = 0
+                    watched = True
+                end if
             else if msg.isPlaybackPosition() then
                 position = msg.GetIndex()
+
                 savePosition(feedItem, position)
             end if
         end if
