@@ -66,9 +66,7 @@ function fetchFeed()
     http = NewHttp("http://apps.npr.org/nproku/feed.json")
     feed = http.GetToStringWithRetry()
 
-    json = BSJSON()
-
-    return json.JsonDecode(feed)
+    return ParseJSON(feed)
 
 end function
 
