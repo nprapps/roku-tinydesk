@@ -2,11 +2,15 @@
 
 import json
 import os
+import shlex
+import subprocess
 
 from dateutil.parser import parse
 import requests
 
 BITRATES = [200000, 500000, 1000000, 2000000]
+UPLOAD_CMD = 's3cmd -P --add-header=Cache-Control:max-age=5 --guess-mime-type sync feed.json s3://apps.npr.org/nproku/'
+print UPLOAD_CMD
 
 response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&numResults=10' % os.environ['NPR_API_KEY'])
 
@@ -60,5 +64,7 @@ for story in data['list']['story']:
 
 print 'Saving %i concerts' % len(output)
 
-with open('source/tinydesk.json', 'w') as f:
+with open('feed.json', 'w') as f:
     json.dump(output, f, indent=4)
+
+subprocess.Popen(shlex.split(UPLOAD_CMD), stdout=subprocess.PIPE, stderr=subprocess.PIPE)

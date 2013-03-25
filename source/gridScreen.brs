@@ -63,10 +63,12 @@ End Function
 ' Parse the video feed
 function fetchFeed()
 
-    json = BSJSON()
-    data = ReadAsciiFile("pkg:/source/tinydesk.json") 
+    http = NewHttp("http://apps.npr.org/nproku/feed.json")
+    feed = http.GetToStringWithRetry()
 
-    return json.JsonDecode(data)
+    json = BSJSON()
+
+    return json.JsonDecode(feed)
 
 end function
 
