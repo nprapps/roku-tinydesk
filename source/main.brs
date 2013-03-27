@@ -9,6 +9,8 @@ Sub Main()
         return
     end if
 
+    initAnalytics()
+    analyticsOnStartup()
     showGridScreen(screen)
 
 End Sub

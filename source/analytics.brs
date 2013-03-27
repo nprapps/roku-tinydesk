@@ -24,52 +24,33 @@ REM   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF 
 REM   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 REM *****************************************************
 
-Function createAnalyticsTracker()
+Function initAnalytics()
 
     obj = CreateObject("roAssociativeArray")
 
-    ' We need a ScreenID property in order to use the view controller for requests.
-    obj.ScreenID = -2
+    m.Account = "UA-5828686-4"
+    m.NumEvents = 0
+    m.NumPlaybackEvents = 0
 
-    obj.Account = "UA-5828686-4"
-    obj.NumEvents = 0
-    obj.NumPlaybackEvents = 0
+    xfer = CreateObject("roUrlTransfer")
 
-    obj.TrackEvent = analyticsTrackEvent
-    obj.OnUrlEvent = analyticsOnUrlEvent
-    obj.OnStartup = analyticsOnStartup
-    obj.Cleanup = analyticsCleanup
-
-    obj.CustomSessionVars = CreateObject("roArray", 5, false)
-    obj.SetCustomSessionVar = analyticsSetCustomSessionVar
-
-    obj.SetCustomSessionVar(1, "X-Plex-Product", "Plex for Roku")
-    obj.SetCustomSessionVar(2, "X-Plex-Client-Identifier", GetGlobal("rokuUniqueID"))
-
-    obj.FormatEvent = analyticsFormatEvent
-    obj.FormatCustomVars = analyticsFormatCustomVars
-
-    ' The URL is huge and terrible, but most of it is static. Build what we can
-    ' now and just append the rest at the time of the event.
-
-    encoder = CreateObject("roUrlTransfer")
-
-    obj.BaseUrl = "http://www.google-analytics.com/__utm.gif"
-    obj.BaseUrl = obj.BaseUrl + "?utmwv=1"
-    obj.BaseUrl = obj.BaseUrl + "&utmsr=" + encoder.Escape(GetGlobal("DisplayMode") + " " + GetGlobal("DisplayType"))
-    obj.BaseUrl = obj.BaseUrl + "&utmsc=24-bit"
-    obj.BaseUrl = obj.BaseUrl + "&utmul=en-us"
-    obj.BaseUrl = obj.BaseUrl + "&utmje=0"
-    obj.BaseUrl = obj.BaseUrl + "&utmfl=-"
-    obj.BaseUrl = obj.BaseUrl + "&utmdt=" + encoder.Escape(GetGlobal("appName"))
-    obj.BaseUrl = obj.BaseUrl + "&utmp=" + encoder.Escape(GetGlobal("appName"))
-    obj.BaseUrl = obj.BaseUrl + "&utmhn=apps.npr.org"
-    obj.BaseUrl = obj.BaseUrl + "&utmr=-"
-    obj.BaseUrl = obj.BaseUrl + "&utmvid=" + encoder.Escape(GetGlobal("rokuUniqueID"))
+    m.BaseUrl = "http://www.google-analytics.com/__utm.gif"
+    m.BaseUrl = m.BaseUrl + "?utmwv=1"
+    'm.BaseUrl = m.BaseUrl + "&utmsr=" + xfer.Escape(GetGlobal("DisplayMode") + " " + GetGlobal("DisplayType"))
+    m.BaseUrl = m.BaseUrl + "&utmsc=24-bit"
+    m.BaseUrl = m.BaseUrl + "&utmul=en-us"
+    m.BaseUrl = m.BaseUrl + "&utmje=0"
+    m.BaseUrl = m.BaseUrl + "&utmfl=-"
+    m.BaseUrl = m.BaseUrl + "&utmdt=tinydesk"
+    m.BaseUrl = m.BaseUrl + "&utmp=tinydesk"
+    m.BaseUrl = m.BaseUrl + "&utmhn=apps.npr.org"
+    m.BaseUrl = m.BaseUrl + "&utmr=-"
+    'm.BaseUrl = m.BaseUrl + "&utmvid=" + xfer.Escape(GetGlobal("rokuUniqueID"))
 
     ' Initialize our "cookies"
     domainHash = "1024141829" ' should be set by Google, but hardcode to something
     visitorID = RegRead("AnalyticsID", "analytics", invalid)
+
     if visitorID = invalid then
         visitorID = GARandNumber(1000000000,9999999999).ToStr()
         RegWrite("AnalyticsID", visitorID, "analytics")
@@ -81,6 +62,7 @@ Function createAnalyticsTracker()
     curTimestamp = timestamp.asSeconds().ToStr()
 
     RegWrite("PrevTimestamp", curTimestamp, "analytics")
+
     if prevTimestamp = invalid then prevTimestamp = curTimestamp
     if firstTimestamp = invalid then
         RegWrite("FirstTimestamp", curTimestamp, "analytics")
@@ -90,11 +72,12 @@ Function createAnalyticsTracker()
     numSessions = RegRead("NumSessions", "analytics", "0").toint() + 1
     RegWrite("NumSessions", numSessions.ToStr(), "analytics")
 
-    obj.BaseUrl = obj.BaseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.tostr()
-    obj.BaseUrl = obj.BaseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
-    obj.BaseUrl = obj.BaseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
+    m.BaseUrl = m.BaseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.tostr()
+    m.BaseUrl = m.BaseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
+    m.BaseUrl = m.BaseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
 
-    obj.SessionTimer = createTimer()
+    m.SessionTimer = CreateObject("roTimespan")
+    m.SessionTimer.mark()
 
     return obj
 
@@ -105,7 +88,7 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
     ' Now's a good time to update our session variables, in case we don't shut
     ' down cleanly.
     if category = "Playback" then m.NumPlaybackEvents = m.NumPlaybackEvents + 1
-    RegWrite("session_duration", tostr(m.SessionTimer.GetElapsedSeconds()), "analytics")
+    RegWrite("session_duration", tostr(m.SessionTimer.TotalSeconds()), "analytics")
     RegWrite("session_playback_events", tostr(m.NumPlaybackEvents), "analytics")
 
     m.NumEvents = m.NumEvents + 1
@@ -120,29 +103,24 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
     url = url + "&utmn=" + GARandNumber(1000000000,9999999999).ToStr()   'Random Request Number
     url = url + "&utmac=" + m.Account
     url = url + "&utmt=event"
-    url = url + "&utme=" + m.FormatEvent(category, action, label, value) + m.FormatCustomVars(customVars)
+    url = url + "&utme=" + analyticsFormatEvent(category, action, label, value) + analyticsFormatCustomVars(customVars)
 
-    Debug("Final analytics URL: " + url)
+    print "Final analytics URL: " + url
     request.SetUrl(url)
-
-    GetViewController().StartRequest(request, m, context)
-
-End Sub
-
-Sub analyticsOnUrlEvent(msg, requestContext)
-
-    ' Don't care about the response at all.
+    request.AsyncGetToString()
 
 End Sub
 
-Sub analyticsOnStartup(signedIn)
+Sub analyticsOnStartup()
 
     lastSessionDuration = RegRead("session_duration", "analytics", "0").toint()
+
     if lastSessionDuration > 0 then
         lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0")
-        m.TrackEvent("App", "Shutdown", "", lastSessionDuration, [invalid, invalid, {name: "NumEvents", value: lastSessionPlaybackEvents}])
+        analyticsTrackEvent("App", "Shutdown", "", lastSessionDuration, [invalid, invalid, {name: "NumEvents", value: lastSessionPlaybackEvents}])
     end if
-    m.TrackEvent("App", "Start", "", 1, [invalid, invalid, {name: "Model", value: GetGlobal("rokuModel")}, {name: "myPlex", value: tostr(signedIn)}])
+
+    analyticsTrackEvent("App", "Start", "", 1, [])
 
 End Sub
 
@@ -151,41 +129,33 @@ Sub analyticsCleanup()
     ' Just note the session duration. We wrote the number of playback events the
     ' last time we got one, and we won't send the actual event until the next
     ' startup.
-    RegWrite("session_duration", tostr(m.SessionTimer.GetElapsedSeconds()), "analytics")
+    RegWrite("session_duration", tostr(m.SessionTimer.TotalSeconds()), "analytics")
     m.SessionTimer = invalid
-
-End Sub
-
-Sub analyticsSetCustomSessionVar(index, name, value)
-
-    m.CustomSessionVars[index - 1] = {name: name, value: value}
 
 End Sub
 
 Function analyticsFormatEvent(category, action, label, value) As String
 
-    encoder = CreateObject("roUrlTransfer")
-    event = "5(" + encoder.Escape(category) + "*" + encoder.Escape(action)
+    xfer = CreateObject("roUrlTransfer")
+
+    event = "5(" + xfer.Escape(category) + "*" + xfer.Escape(action)
     if label <> invalid then
-        event = event + "*" + encoder.Escape(firstOf(label, ""))
+        event = event + "*" + xfer.Escape(label)
     end if
     if value <> invalid then
         event = event + ")(" + tostr(value)
     end if
     event = event + ")"
+
     return event
+
 End Function
 
-Function analyticsFormatCustomVars(pageVars) As String
-    encoder = CreateObject("roUrlTransfer")
+Function analyticsFormatCustomVars(vars) As String
+    xfer = CreateObject("roUrlTransfer")
     vars = CreateObject("roArray", 5, false)
-    hasVar = false
-    for i = 0 to 4
-        vars[i] = firstOf(pageVars[i], m.CustomSessionVars[i])
-        if vars[i] <> invalid then hasVar = true
-    end for
 
-    if NOT hasVar then return ""
+    if vars.count() = 0 then return ""
 
     names = "8"
     values = "9"
@@ -202,8 +172,8 @@ Function analyticsFormatCustomVars(pageVars) As String
                 prefix = "*"
             end if
 
-            names = names + prefix + encoder.Escape(firstOf(vars[i].name, ""))
-            values = values + prefix + encoder.Escape(firstOf(vars[i].value, ""))
+            names = names + prefix + xfer.Escape(firstOf(vars[i].name, ""))
+            values = values + prefix + xfer.Escape(firstOf(vars[i].value, ""))
 
             if pageVars[i] <> invalid then
                 scope = "3"
