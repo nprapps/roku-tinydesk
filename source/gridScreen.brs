@@ -20,8 +20,9 @@ Function showGridScreen(screen as Object) as Integer
 
     m.ALL = 0
     m.RECENT = 1
+    m.SEARCH = 2
+    m.titles = ["All", "Recently watched", "Search results"]
     m.lists = []
-    m.titles = ["All", "Recently watched"]
 
     screen.Show()
 
@@ -52,7 +53,7 @@ Function showGridScreen(screen as Object) as Integer
                     mark_as_watched(feedItem)
                 end if
 
-                ' Remove vid from recent listif it already exists
+                ' Remove vid from recent list if it already exists
                 for i = 0 to m.lists[m.RECENT].count() - 1
                     if m.lists[m.RECENT][i].Id = feedItem.Id then
                         m.lists[m.RECENT].delete(i)
@@ -63,7 +64,17 @@ Function showGridScreen(screen as Object) as Integer
                 ' Add vid to recent list
                 m.lists[m.RECENT].unshift(feedItem)
 
-                screen.SetContentList(m.RECENT, m.lists[m.RECENT])
+                refreshLists(screen)
+
+                screen.SetFocusedListItem(m.RECENT, 0)
+            else if msg.isRemoteKeyPressed() then
+                if msg.GetIndex() = 10 then
+                    m.lists[m.SEARCH] = showSearchScreen(feed)
+                    
+                    refreshLists(screen)
+
+                    screen.SetFocusedListItem(m.SEARCH, 0)
+                end if
             else if msg.isScreenClosed() then
                 return -1
             end if
@@ -122,23 +133,39 @@ Function initLists(screen, feed)
             m.lists[m.RECENT].Push(feedItem)
         end if
     end for
-
+    
     m.lists[m.ALL] = feed
     m.lists[m.RECENT] = sortLastWatched(m.lists[m.RECENT])
-   
+    m.lists[m.SEARCH] = []
+
+    refreshLists(screen)
+
+    screen.Show()
+
+End Function
+
+' Render the grid lists, but only those with data
+Function refreshLists(screen)
+
+    titles = [m.titles[m.ALL]]
+    lists = [m.lists[m.ALL]]
+
     if m.lists[m.RECENT].count() > 0 then
-        screen.SetupLists(2)
-        screen.SetListNames(m.titles)
-    else
-        screen.SetupLists(1)
-        screen.SetListNames([m.titles[m.ALL]])
+        titles.Push(m.titles[m.RECENT])
+        lists.Push(m.lists[m.RECENT])
     end if
 
-    screen.SetContentList(m.ALL, m.lists[m.ALL])
-
-    if m.lists[m.RECENT].count() > 0 then
-        screen.SetContentList(m.RECENT, m.lists[m.RECENT])
+    if m.lists[m.SEARCH].count() > 0 then
+        titles.Push(m.titles[m.SEARCH])
+        lists.Push(m.lists[m.SEARCH])
     end if
+
+    screen.SetupLists(titles.Count())
+    screen.SetListNames(titles)
+
+    for i = 0 to lists.count() - 1
+        screen.SetContentList(i, lists[i])
+    end for
 
     screen.Show()
 
