@@ -7,6 +7,9 @@ Function preShowGridScreen() As Object
 
     screen.SetGridStyle("flat-landscape")
     screen.SetDisplayMode("photo-fit")
+    
+    ' Always setup at least one list (keeps tooltips from appearing in the wrong place)
+    screen.SetupLists(1)
 
     return screen
 
@@ -17,12 +20,8 @@ Function showGridScreen(screen as Object) as Integer
 
     m.ALL = 0
     m.RECENT = 1
-
-    m.titles = ["All", "Recently watched"]
     m.lists = []
-
-    screen.SetupLists(m.titles.Count())
-    screen.SetListNames(m.titles)
+    m.titles = ["All", "Recently watched"]
 
     screen.Show()
 
@@ -101,21 +100,36 @@ End Function
 ' Initialize the video lists
 Function initLists(screen, feed)
 
-    recent = []
+    for i = 0 to m.titles.count() - 1
+        m.lists[i] = []
+    end for
 
     for each feedItem in feed
         feedItem.lastWatched = get_last_watched(feedItem)
 
         if feedItem.lastWatched <> invalid then
-            recent.Push(feedItem)
+            m.lists[m.RECENT].Push(feedItem)
         end if
-
     end for
 
-    recent = sortLastWatched(recent)
+    m.lists[m.ALL] = feed
+    m.lists[m.RECENT] = sortLastWatched(m.lists[m.RECENT])
    
-    screen.SetContentList(m.ALL, feed)
-    screen.SetContentList(m.RECENT, recent)
+    if m.lists[m.RECENT].count() > 0 then
+        screen.SetupLists(2)
+        screen.SetListNames(m.titles)
+    else
+        screen.SetupLists(1)
+        screen.SetListNames([m.titles[m.ALL]])
+    end if
+
+    screen.SetContentList(m.ALL, m.lists[m.ALL])
+
+    if m.lists[m.RECENT].count() > 0 then
+        screen.SetContentList(m.RECENT, m.lists[m.RECENT])
+    end if
+
+    screen.Show()
 
 End Function
 
@@ -123,14 +137,14 @@ End Function
 function set_last_watched(feedItem)
 
     now = CreateObject("roDateTime").asSeconds().toStr()
-    RegWrite(feedItem.Id + "_recent", now, "nproku")
+    RegWrite(feedItem.Id, now, "recent")
 
 end function
 
 ' Get the timestamp the  video was last watched
 function get_last_watched(feedItem)
 
-    lastWatched = RegRead(feedItem.Id + "_recent", "nproku")
+    lastWatched = RegRead(feedItem.Id, "recent")
     
     if lastWatched = invalid
         return invalid
@@ -142,16 +156,16 @@ end function
 ' Mark a video watched in the registry
 function mark_as_watched(feedItem)
 
-    RegWrite(feedItem.Id + "_watched", "watched", "nproku")
+    RegWrite(feedItem.Id, "true", "watched")
 
 end function
 
 ' Check the registry to see if a feed item has been watched
 function is_watched(feedItem)
 
-    read = RegRead(feedItem.Id + "_watched", "nproku")
+    read = RegRead(feedItem.Id, "watched")
 
-    return read = "watched"
+    return read = "true"
 
 end function
 
