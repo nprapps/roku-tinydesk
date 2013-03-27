@@ -5,6 +5,7 @@ Function preShowGridScreen() As Object
     screen = CreateObject("roGridScreen")
     screen.SetMessagePort(port)
 
+    screen.SetBreadcrumbText("", "Press * to search            ")
     screen.SetGridStyle("flat-landscape")
     screen.SetDisplayMode("photo-fit")
     
