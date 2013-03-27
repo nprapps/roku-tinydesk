@@ -24,6 +24,10 @@ Function showGridScreen(screen as Object) as Integer
     m.titles = ["All", "Recently watched", "Search results"]
     m.lists = []
 
+    ' Populated by initLists
+    m.visibleTitles = []
+    m.visibleLists = []
+
     screen.Show()
 
     screen.ShowMessage("Retrieving...")
@@ -44,7 +48,7 @@ Function showGridScreen(screen as Object) as Integer
             if msg.isListItemSelected() then
                 selected_list = msg.GetIndex()
                 selected_item = msg.GetData()
-                feedItem = m.lists[selected_list][selected_item]
+                feedItem = m.visibleLists[selected_list][selected_item]
 
                 watched = showVideoScreen(feedItem)
                 set_last_watched(feedItem)
@@ -147,24 +151,24 @@ End Function
 ' Render the grid lists, but only those with data
 Function refreshLists(screen)
 
-    titles = [m.titles[m.ALL]]
-    lists = [m.lists[m.ALL]]
+    m.visibleTitles = [m.titles[m.ALL]]
+    m.visibleLists = [m.lists[m.ALL]]
 
-    if m.lists[m.RECENT].count() > 0 then
-        titles.Push(m.titles[m.RECENT])
-        lists.Push(m.lists[m.RECENT])
+    if m.lists[m.RECENT].Count() > 0 then
+        m.visibleTitles.Push(m.titles[m.RECENT])
+        m.visibleLists.Push(m.lists[m.RECENT])
     end if
 
-    if m.lists[m.SEARCH].count() > 0 then
-        titles.Push(m.titles[m.SEARCH])
-        lists.Push(m.lists[m.SEARCH])
+    if m.lists[m.SEARCH].Count() > 0 then
+        m.visibleTitles.Push(m.titles[m.SEARCH])
+        m.visibleLists.Push(m.lists[m.SEARCH])
     end if
 
-    screen.SetupLists(titles.Count())
-    screen.SetListNames(titles)
+    screen.SetupLists(m.visibleTitles.Count())
+    screen.SetListNames(m.visibleTitles)
 
-    for i = 0 to lists.count() - 1
-        screen.SetContentList(i, lists[i])
+    for i = 0 to m.visibleLists.Count() - 1
+        screen.SetContentList(i, m.visibleLists[i])
     end for
 
     screen.Show()
