@@ -15,11 +15,10 @@ End Function
 ' Run the grid screen
 Function showGridScreen(screen as Object) as Integer
 
-    m.UNWATCHED = 0
+    m.ALL = 0
     m.RECENT = 1
-    m.WATCHED = 2
 
-    m.titles = ["New", "Recent", "Watched"]
+    m.titles = ["All", "Recently watched"]
     m.lists = []
 
     screen.SetupLists(m.titles.Count())
@@ -102,30 +101,21 @@ End Function
 ' Initialize the video lists
 Function initLists(screen, feed)
 
-    for i = 0 to m.titles.Count() - 1
-        m.lists[i] = []
-    end for
+    recent = []
 
     for each feedItem in feed
-        if is_watched(feedItem)
-            m.lists[m.WATCHED].Push(feedItem)
-        else
-            m.lists[m.UNWATCHED].Push(feedItem)
-        end if
-
         feedItem.lastWatched = get_last_watched(feedItem)
 
         if feedItem.lastWatched <> invalid then
-            m.lists[m.RECENT].Push(feedItem)
+            recent.Push(feedItem)
         end if
 
     end for
 
-    m.lists[m.RECENT] = sortLastWatched(m.lists[m.RECENT])
+    recent = sortLastWatched(recent)
    
-    for i = 0 to m.lists.Count() - 1
-        screen.SetContentList(i, m.lists[i])
-    end for
+    screen.SetContentList(m.ALL, feed)
+    screen.SetContentList(m.RECENT, recent)
 
 End Function
 
