@@ -51,8 +51,19 @@ Function showGridScreen(screen as Object) as Integer
                 if watched and selected_list <> m.WATCHED then
                     mark_as_watched(feedItem)
                 end if
-                    
-                initLists(screen, feed)
+
+                ' Remove vid from recent listif it already exists
+                for i = 0 to m.lists[m.RECENT].count() - 1
+                    if m.lists[m.RECENT][i].Id = feedItem.Id then
+                        m.lists[m.RECENT].delete(i)
+                        exit for
+                    end if
+                end for
+                
+                ' Add vid to recent list
+                m.lists[m.RECENT].unshift(feedItem)
+
+                screen.SetContentList(m.RECENT, m.lists[m.RECENT])
             else if msg.isScreenClosed() then
                 return -1
             end if

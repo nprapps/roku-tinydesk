@@ -29,6 +29,9 @@ Function showVideoScreen(feedItem As Object) as Boolean
                 ' TODO
                 print "Video status: "; msg.GetIndex(); " " msg.GetData()
             else if msg.isFullResult()
+                position = 0
+                savePosition(feedItem, position)
+
                 watched = True
                 exit while
             else if msg.isPartialResult()
