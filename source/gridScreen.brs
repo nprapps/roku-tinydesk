@@ -91,8 +91,7 @@ End Function
 ' Parse the video feed
 function fetchFeed()
 
-    http = NewHttp("http://apps.npr.org/nproku/feed.json")
-    feed = http.GetToStringWithRetry()
+    feed = http_get_with_retry("http://apps.npr.org/nproku/feed.json")
 
     return ParseJSON(feed)
 

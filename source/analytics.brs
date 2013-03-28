@@ -72,7 +72,7 @@ Function initAnalytics()
     numSessions = RegRead("NumSessions", "analytics", "0").toint() + 1
     RegWrite("NumSessions", numSessions.ToStr(), "analytics")
 
-    m.BaseUrl = m.BaseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.tostr()
+    m.BaseUrl = m.BaseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.ToStr()
     m.BaseUrl = m.BaseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
     m.BaseUrl = m.BaseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
 
@@ -88,8 +88,8 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
     ' Now's a good time to update our session variables, in case we don't shut
     ' down cleanly.
     if category = "Playback" then m.NumPlaybackEvents = m.NumPlaybackEvents + 1
-    RegWrite("session_duration", tostr(m.SessionTimer.TotalSeconds()), "analytics")
-    RegWrite("session_playback_events", tostr(m.NumPlaybackEvents), "analytics")
+    RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
+    RegWrite("session_playback_events", m.NumPlaybackEvents.ToStr(), "analytics")
 
     m.NumEvents = m.NumEvents + 1
 
@@ -99,7 +99,7 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
     context.requestType = "analytics"
 
     url = m.BaseUrl
-    url = url + "&utms=" + m.NumEvents.tostr()
+    url = url + "&utms=" + m.NumEvents.ToStr()
     url = url + "&utmn=" + GARandNumber(1000000000,9999999999).ToStr()   'Random Request Number
     url = url + "&utmac=" + m.Account
     url = url + "&utmt=event"
@@ -117,10 +117,10 @@ Sub analyticsOnStartup()
 
     if lastSessionDuration > 0 then
         lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0")
-        analyticsTrackEvent("App", "Shutdown", "", lastSessionDuration, [invalid, invalid, {name: "NumEvents", value: lastSessionPlaybackEvents}])
+        analyticsTrackEvent("App", "Shutdown", "", lastSessionDuration.ToStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.ToStr() }])
     end if
 
-    analyticsTrackEvent("App", "Start", "", 1, [])
+    analyticsTrackEvent("App", "Start", "", "1", [])
 
 End Sub
 
@@ -129,7 +129,7 @@ Sub analyticsCleanup()
     ' Just note the session duration. We wrote the number of playback events the
     ' last time we got one, and we won't send the actual event until the next
     ' startup.
-    RegWrite("session_duration", tostr(m.SessionTimer.TotalSeconds()), "analytics")
+    RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
     m.SessionTimer = invalid
 
 End Sub
@@ -143,7 +143,7 @@ Function analyticsFormatEvent(category, action, label, value) As String
         event = event + "*" + xfer.Escape(label)
     end if
     if value <> invalid then
-        event = event + ")(" + tostr(value)
+        event = event + ")(" + value
     end if
     event = event + ")"
 
@@ -167,7 +167,7 @@ Function analyticsFormatCustomVars(vars) As String
             if i = 0 then
                 prefix = "("
             else if skipped then
-                prefix = i.tostr() + "!"
+                prefix = i.ToStr() + "!"
             else
                 prefix = "*"
             end if
