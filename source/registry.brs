@@ -1,4 +1,6 @@
+'
 ' Utility functions for working with the registry
+'
 
 ' Read a key from the registry
 Function RegRead(key, section=invalid, default=invalid)

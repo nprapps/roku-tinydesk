@@ -1,4 +1,6 @@
-' nprapps Roku app
+'
+' Tiny Desk Roku app
+'
 
 Sub Main()
 

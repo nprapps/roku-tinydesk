@@ -1,3 +1,8 @@
+'
+' The video search screen.
+'
+
+' Display the search screen
 Function showSearchScreen(feed)
 
     m.feed = feed
@@ -38,6 +43,7 @@ Function showSearchScreen(feed)
 
 End Function
 
+' Get a list of suggestions for a given search string
 Function getSuggestions(searchString)
 
     lSearchString = LCase(searchString)
@@ -53,6 +59,7 @@ Function getSuggestions(searchString)
 
 End Function
 
+' Get a list of matches for a given search string
 Function getMatches(searchString)
 
     if searchString = invalid or searchString = "" then

@@ -1,8 +1,11 @@
-' Analytics module based on code from the Plex Roku client
+'
+' Analytics module based on code from the Plex Roku client.
+'
 ' Original code: https://github.com/plexinc/roku-client-public/blob/master/Plex/source/Analytics.brs
 ' License to use explicitly granted: https://github.com/plexinc/roku-client-public/issues/233#issuecomment-15557688
 ' The Plex code was itself based on: http://bloggingwordpress.com/2012/04/google-analytics-for-roku-developers/
 ' Original licenses follows: 
+'
 
 REM *****************************************************
 REM   Google Analytics Tracking Library for Roku

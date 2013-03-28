@@ -1,3 +1,7 @@
+'
+' Video playback screen
+'
+
 ' Play a video
 Function showVideoScreen(feedItem As Object) as Boolean
 
