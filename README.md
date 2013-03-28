@@ -1,7 +1,5 @@
-nproku
-======
-
-Any experiment. Borrows code from the Roku example apps and from [https://github.com/brianboyer/feedtv](https://github.com/brianboyer/feedtv)
+Tiny Desk Concerts Roku app
+===========================
 
 Setup
 -----
@@ -27,7 +25,9 @@ $ pip install requirements.txt
 Generate JSON feed
 ------------------
 
-To generate the Tiny Desk API feed:
+You will need `s3cmd` installed and configured with the `nprapps` AWS keys in order to deploy the feed.
+
+To generate (and deploy) the Tiny Desk API feed:
 
 ```
 $ workon nproku
