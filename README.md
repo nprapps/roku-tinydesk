@@ -54,6 +54,18 @@ To connect to your Roku for debugging:
 $ telnet $ROKU_IP 8085
 ```
 
+Analytics events
+----------------
+
+|Category|Action|Label|
+|--------|------|-----|
+|Tiny Desk|Startup|| 
+|Tiny Desk|Shutdown|| 
+|Tiny Desk|Start|Title|
+|Tiny Desk|Continue|Title|
+|Tiny Desk|Finish|Title|
+|Tiny Desk|Stop|Title|
+
 Code conventions
 ----------------
 

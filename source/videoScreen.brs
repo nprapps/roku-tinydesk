@@ -30,9 +30,9 @@ function VideoScreen_play(contentItem) as Boolean
     contentItem.playStart = this._position
 
     if position > 0 then
-        analyticsTrackEvent("Tiny Desk", "Continue", "", contentItem.Title, [])
+        analyticsTrackEvent("Tiny Desk", "Continue", contentItem.Title, "", [])
     else
-        analyticsTrackEvent("Tiny Desk", "Start", "", contentItem.Title, [])
+        analyticsTrackEvent("Tiny Desk", "Start", contentItem.Title, "", [])
     end if
 
     print "Video playback will begin at: " position 
@@ -54,7 +54,7 @@ function VideoScreen_play(contentItem) as Boolean
             savePosition(contentItem, position)
 
             watched = True
-            analyticsTrackEvent("Tiny Desk", "Finish", "", contentItem.title, [])
+            analyticsTrackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
 
             exit while
         else if msg.isPartialResult()
@@ -64,9 +64,9 @@ function VideoScreen_play(contentItem) as Boolean
                 savePosition(contentItem, position)
 
                 watched = True
-                analyticsTrackEvent("Tiny Desk", "Finish", "", contentItem.title, [])
+                analyticsTrackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
             else
-                analyticsTrackEvent("Tiny Desk", "Stop", "", contentItem.title, [])
+                analyticsTrackEvent("Tiny Desk", "Stop", contentItem.title, "", [])
             end if
         else if msg.isPlaybackPosition() then
             position = msg.getIndex()

@@ -119,7 +119,7 @@ Sub analyticsOnStartup()
         analyticsTrackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.toStr() }])
     end if
 
-    analyticsTrackEvent("Tiny Desk", "Start", "", "1", [])
+    analyticsTrackEvent("Tiny Desk", "Startup", "", "", [])
 
 End Sub
 
@@ -128,7 +128,6 @@ Sub analyticsCleanup()
     ' Just note the session duration. We wrote the number of playback events the
     ' last time we got one, and we won't send the actual event until the next
     ' startup.
-    print m.SessionTimer.TotalSeconds()
     RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
     m.SessionTimer = invalid
 
