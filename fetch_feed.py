@@ -17,8 +17,10 @@ class MLStripper(HTMLParser):
     def __init__(self):
         self.reset()
         self.fed = []
+
     def handle_data(self, d):
         self.fed.append(d)
+
     def get_data(self):
         return ''.join(self.fed)
 
@@ -44,32 +46,32 @@ def main():
             print story['title']['$text']
 
             item = {
-                'Id': story['id'],
-                'Title': story['title']['$text'],
-                'Description': strip_tags(story['miniTeaser']['$text']),
-                'SDPosterUrl': None,
-                'HDPosterUrl': None,
-                'Length': int(story['multimedia'][0]['duration']['$text']),
-                'ReleaseDate': None,
-                'StreamFormat': 'mp4',
-                'StreamBitrates': [],
-                'StreamUrls': [],
-                'StreamQualities': [],
-                'IsHD': True,
-                'HDBranded': True
+                'id': story['id'],
+                'title': story['title']['$text'],
+                'description': strip_tags(story['miniTeaser']['$text']),
+                'sdPosterUrl': None,
+                'hdPosterUrl': None,
+                'length': int(story['multimedia'][0]['duration']['$text']),
+                'releaseDate': None,
+                'streamFormat': 'mp4',
+                'streamBitrates': [],
+                'streamUrls': [],
+                'streamQualities': [],
+                'isHD': True,
+                'hdBranded': True
             }
 
             alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
 
-            item['SDPosterUrl'] = alt_image_url + '?s=2'
-            item['HDPosterUrl'] = alt_image_url + '?s=3'
+            item['sdPosterUrl'] = alt_image_url + '?s=2'
+            item['hdPosterUrl'] = alt_image_url + '?s=3'
 
 
             # Formatted as: "Mon, 11 Mar 2013 14:03:00 -0400"
             pub_date = story['pubDate']['$text']
             dt = parse(pub_date)
 
-            item['ReleaseDate'] = dt.strftime('%B %d, %Y') 
+            item['releaseDate'] = dt.strftime('%B %d, %Y') 
 
             if 'mp4' not in story['multimedia'][0]['format']:
                 print '--> No mp4 video, skipping!'
@@ -78,13 +80,13 @@ def main():
             video_url = story['multimedia'][0]['format']['mp4']['$text']
             
             for bitrate in BITRATES:
-                item['StreamBitrates'].append(int(bitrate / 1024))
-                item['StreamUrls'].append(video_url.replace('-n', '-n-%i' % bitrate))
-                item['StreamQualities'].append('SD')
+                item['streamBitrates'].append(int(bitrate / 1024))
+                item['streamUrls'].append(video_url.replace('-n', '-n-%i' % bitrate))
+                item['streamQualities'].append('SD')
 
             # The last item is full resolution 
-            item['StreamUrls'][-1] = video_url
-            item['StreamQualities'][-1] = 'HD'
+            item['streamUrls'][-1] = video_url
+            item['streamQualities'][-1] = 'HD'
 
             output.append(item)
 

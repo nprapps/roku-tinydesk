@@ -62,7 +62,7 @@ function GridScreen()
 
                 ' Remove vid from recent list if it already exists
                 for i = 0 to this._lists[this.RECENT].count() - 1
-                    if this._lists[this.RECENT][i].Id = feedItem.Id then
+                    if this._lists[this.RECENT][i].id = feedItem.id then
                         this._lists[this.RECENT].delete(i)
                         exit for
                     end if
@@ -177,14 +177,14 @@ end function
 function set_last_watched(feedItem)
 
     now = createObject("roDateTime").asSeconds().toStr()
-    RegWrite(feedItem.Id, now, "recent")
+    RegWrite(feedItem.id, now, "recent")
 
 end function
 
 ' Get the timestamp the  video was last watched
 function get_last_watched(feedItem)
 
-    lastWatched = RegRead(feedItem.Id, "recent")
+    lastWatched = RegRead(feedItem.id, "recent")
     
     if lastWatched = invalid
         return invalid
@@ -197,14 +197,14 @@ end function
 ' Mark a video watched in the registry
 function mark_as_watched(feedItem)
 
-    RegWrite(feedItem.Id, "true", "watched")
+    RegWrite(feedItem.id, "true", "watched")
 
 end function
 
 ' Check the registry to see if a feed item has been watched
 function is_watched(feedItem)
 
-    read = RegRead(feedItem.Id, "watched")
+    read = RegRead(feedItem.id, "watched")
 
     return read = "true"
 

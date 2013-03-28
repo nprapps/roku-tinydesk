@@ -2,12 +2,12 @@
 ' Tiny Desk Roku app
 '
 
-Sub Main()
+function Main()
 
     initAnalytics()
     analyticsOnStartup()
     GridScreen()
     analyticsCleanup()
 
-End Sub
+end function
 
