@@ -127,6 +127,7 @@ function _GridScreen_initLists()
     this._lists[this.SEARCH] = []
 
     this._refreshLists()
+    this._screen.setFocusedListItem(this.RECENT, 0)
 
     this._screen.Show()
 
@@ -150,11 +151,12 @@ function _GridScreen_refreshLists()
         this._visibleLists.Push(this._lists[this.SEARCH])
     end if
 
-    this._screen.SetupLists(this._visibleTitles.Count())
-    this._screen.SetListNames(this._visibleTitles)
+    this._screen.setupLists(this._visibleTitles.Count())
+    this._screen.setListNames(this._visibleTitles)
 
     for i = 0 to this._visibleLists.Count() - 1
-        this._screen.SetContentList(i, this._visibleLists[i])
+        this._screen.setContentList(i, this._visibleLists[i])
+        this._screen.setFocusedListItem(i, 0)
     end for
 
     this._screen.Show()
