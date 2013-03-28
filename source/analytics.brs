@@ -106,7 +106,7 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
     url = url + "&utme=" + analyticsFormatEvent(category, action, label, value) + analyticsFormatCustomVars(customVars)
 
     print "Analytics URL: " + url
-    http_get_async_ignore_response(url)
+    http_get_ignore_response(url)
 
 End Sub
 
