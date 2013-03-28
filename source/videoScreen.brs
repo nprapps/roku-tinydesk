@@ -2,63 +2,76 @@
 ' Video playback screen
 '
 
-' Play a video
-Function showVideoScreen(feedItem As Object) as Boolean
+' Video screen constructor 
+function VideoScreen()
 
-    port = CreateObject("roMessagePort")
-    screen = CreateObject("roVideoScreen")
-    screen.SetMessagePort(port)
+    ' Member vars
+    this = {}
+
+    this._port = CreateObject("roMessagePort")
     
-    watched = false
+    ' Member functions
+    this.play = VideoScreen_play
 
-    position = loadPosition(feedItem)
-    feedItem.PlayStart = position
+    return this
+
+end function
+
+' Play a video and return if it was completely watched
+function VideoScreen_play(contentItem) as Boolean
+
+    this = m
+    
+    this._screen = CreateObject("roVideoScreen")
+    this._screen.setMessagePort(this._port)
+
+    watched = false
+    position = loadPosition(contentItem)
+    contentItem.playStart = this._position
 
     if position > 0 then
-        analyticsTrackEvent("Tiny Desk", "Continue", "", feedItem.Title, [])
+        analyticsTrackEvent("Tiny Desk", "Continue", "", contentItem.Title, [])
     else
-        analyticsTrackEvent("Tiny Desk", "Start", "", feedItem.Title, [])
+        analyticsTrackEvent("Tiny Desk", "Start", "", contentItem.Title, [])
     end if
 
-    print "Video playback will begin at: " feedItem.PlayStart
+    print "Video playback will begin at: " position 
 
-    screen.SetPositionNotificationPeriod(1)
-    screen.SetContent(feedItem)
-    screen.Show()
+    this._screen.setPositionNotificationPeriod(1)
+    this._screen.setContent(contentItem)
+    this._screen.show()
 
     while true
-        msg = wait(0, port)
+        msg = wait(0, this._port)
 
-        if type(msg) = "roVideoScreenEvent" then
-            if msg.isScreenClosed()
-                exit while
-            else if msg.isRequestFailed()
-                ' TODO
-                print "Video request failure: "; msg.GetIndex(); " " msg.GetData()
-            else if msg.isFullResult()
+        if msg.isScreenClosed()
+            exit while
+        else if msg.isRequestFailed()
+            ' TODO
+            print "Video request failure: "; msg.getIndex(); " " msg.getData()
+        else if msg.isFullResult()
+            position = 0
+            savePosition(contentItem, position)
+
+            watched = True
+            analyticsTrackEvent("Tiny Desk", "Finish", "", contentItem.title, [])
+
+            exit while
+        else if msg.isPartialResult()
+            ' If user watched more than 95% count video as watched
+            if position >= int(contentItem.Length * 0.95) then
                 position = 0
-                savePosition(feedItem, position)
-    
+                savePosition(contentItem, position)
+
                 watched = True
-                analyticsTrackEvent("Tiny Desk", "Finish", "", feedItem.Title, [])
-
-                exit while
-            else if msg.isPartialResult()
-                ' If user watched more than 95% count video as watched
-                if position >= int(feedItem.Length * 0.95) then
-                    position = 0
-                    savePosition(feedItem, position)
-
-                    watched = True
-                    analyticsTrackEvent("Tiny Desk", "Finish", "", feedItem.Title, [])
-                else
-                    analyticsTrackEvent("Tiny Desk", "Stop", "", feedItem.Title, [])
-                end if
-            else if msg.isPlaybackPosition() then
-                position = msg.GetIndex()
-
-                savePosition(feedItem, position)
+                analyticsTrackEvent("Tiny Desk", "Finish", "", contentItem.title, [])
+            else
+                analyticsTrackEvent("Tiny Desk", "Stop", "", contentItem.title, [])
             end if
+        else if msg.isPlaybackPosition() then
+            position = msg.getIndex()
+
+            savePosition(contentItem, position)
         end if
     end while
 
@@ -66,22 +79,4 @@ Function showVideoScreen(feedItem As Object) as Boolean
 
 End Function
 
-' Save playback position
-Function savePosition(feedItem, position)
 
-    RegWrite(feedItem.id, position.toStr(), "position")
-
-End Function
-
-' Load playback position
-Function loadPosition(feedItem) as Integer
-
-    position = RegRead(feedItem.Id, "position")
-    
-    if position = Invalid then
-        return 0
-    end if
-
-    return position.toInt()
-
-End Function

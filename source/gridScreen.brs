@@ -3,7 +3,7 @@
 '
 
 ' Grid screen constructor
-function GridScreen()
+function GridScreen() as Object
 
     ' Member vars
     this = {}
@@ -14,6 +14,8 @@ function GridScreen()
 
     this._port = createObject("roMessagePort")
     this._screen = createObject("roGridScreen")
+    this._videoScreen = VideoScreen()
+    this._searchScreen = SearchScreen()
 
     this._feed = []
     this._titles = ["All", "Recently watched", "Search results"]
@@ -46,47 +48,46 @@ function GridScreen()
     while true
         msg = wait(0, this._port)
 
-        if type(msg) = "roGridScreenEvent" then
+        if msg.isListItemSelected() then
+            selected_list = msg.getIndex()
+            selected_item = msg.getData()
+            contentItem = this._visibleLists[selected_list][selected_item]
 
-            if msg.isListItemSelected() then
-                selected_list = msg.getIndex()
-                selected_item = msg.getData()
-                feedItem = this._visibleLists[selected_list][selected_item]
+            watched = this._videoScreen.play(contentItem)
+            setLastWatched(contentItem)
 
-                watched = showVideoScreen(feedItem)
-                setLastWatched(feedItem)
+            if watched and selected_list <> this.WATCHED then
+                markAsWatched(contentItem)
+            end if
 
-                if watched and selected_list <> this.WATCHED then
-                    markAsWatched(feedItem)
+            ' Remove vid from recent list if it already exists
+            for i = 0 to this._lists[this.RECENT].count() - 1
+                if this._lists[this.RECENT][i].id = contentItem.id then
+                    this._lists[this.RECENT].delete(i)
+                    exit for
                 end if
+            end for
+            
+            ' Add vid to recent list
+            this._lists[this.RECENT].unshift(contentItem)
 
-                ' Remove vid from recent list if it already exists
-                for i = 0 to this._lists[this.RECENT].count() - 1
-                    if this._lists[this.RECENT][i].id = feedItem.id then
-                        this._lists[this.RECENT].delete(i)
-                        exit for
-                    end if
-                end for
+            this._refreshLists()
+
+            this._screen.setFocusedListItem(this.RECENT, 0)
+        else if msg.isRemoteKeyPressed() then
+            if msg.getIndex() = 10 then
+                this._lists[this.SEARCH] = this._searchScreen.search(this._feed)
                 
-                ' Add vid to recent list
-                this._lists[this.RECENT].unshift(feedItem)
-
                 this._refreshLists()
 
-                this._screen.setFocusedListItem(this.RECENT, 0)
-            else if msg.isRemoteKeyPressed() then
-                if msg.getIndex() = 10 then
-                    this._lists[this.SEARCH] = showSearchScreen(feed)
-                    
-                    this._refreshLists()
-
-                    this._screen.setFocusedListItem(this.SEARCH, 0)
-                end if
-            else if msg.isScreenClosed() then
-                exit while
+                this._screen.setFocusedListItem(this.SEARCH, 0)
             end if
+        else if msg.isScreenClosed() then
+            exit while
         end if
     end while
+
+    return this
 
 end function
 
@@ -100,11 +101,11 @@ function _GridScreen_initLists()
         this._lists[i] = []
     end for
 
-    for each feedItem in this._feed 
-        feedItem.lastWatched = getLastWatched(feedItem)
+    for each contentItem in this._feed 
+        contentItem.lastWatched = getLastWatched(contentItem)
 
-        if feedItem.lastWatched <> invalid then
-            this._lists[this.RECENT].Push(feedItem)
+        if contentItem.lastWatched <> invalid then
+            this._lists[this.RECENT].Push(contentItem)
         end if
     end for
     
@@ -144,78 +145,6 @@ function _GridScreen_refreshLists()
     end for
 
     this._screen.Show()
-
-end function
-
-' BubbleSort a feed of videos by last watched
-function sortByLastWatched(list)
-
-    swapped = true
-
-    while swapped = true
-        swapped = false
-
-        for i = 0 to list.Count() - 1
-            if list[i + 1] = invalid then
-                exit for
-            end if
-
-            if list[i].lastWatched < list[i + 1].lastWatched then
-                temp = list[i]
-                list[i] = list[i + 1]
-                list[i + 1] = temp
-                swapped = true
-            end if
-        end for
-    end while
-
-    return list
-
-end function
-
-' Set last watch timestamp in the registry
-function setLastWatched(feedItem)
-
-    now = createObject("roDateTime").asSeconds().toStr()
-    RegWrite(feedItem.id, now, "recent")
-
-end function
-
-' Get the timestamp the  video was last watched
-function getLastWatched(feedItem)
-
-    lastWatched = RegRead(feedItem.id, "recent")
-    
-    if lastWatched = invalid
-        return invalid
-    end if
-    
-    return lastWatched.toInt()
-
-end function
-
-' Mark a video watched in the registry
-function markAsWatched(feedItem)
-
-    RegWrite(feedItem.id, "true", "watched")
-
-end function
-
-' Check the registry to see if a feed item has been watched
-function isWatched(feedItem)
-
-    read = RegRead(feedItem.id, "watched")
-
-    return read = "true"
-
-end function
-
-' Fetch and parse the video feed
-function fetchFeed()
-
-    feed = http_get_with_retry("http://apps.npr.org/roku-tinydesk/feed.json")
-
-    return ParseJSON(feed)
 
 end function
 

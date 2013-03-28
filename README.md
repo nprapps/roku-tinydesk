@@ -76,3 +76,14 @@ Comments describing a functions purpose should *precede* the function defintion.
 In class constructors define the class object as `this`. In member functions redefine the class object as `this = m`.
 
 Never use `sub`. Always use `function`.
+
+Modules should begin with a block comment explaning their purpose:
+
+```
+'
+' Explainer goes here
+'
+
+function main()
+    blah blah
+```

@@ -2,26 +2,42 @@
 ' The video search screen.
 '
 
-' Display the search screen
-Function showSearchScreen(feed)
+function SearchScreen() as Object
 
-    m.feed = feed
+    ' Member vars
+    this = {}
 
-    port = CreateObject("roMessagePort")
-    screen = CreateObject("roSearchScreen")
-    screen.SetBreadcrumbText("", "Search")
-    screen.SetMessagePort(port) 
-
-    screen.SetSearchTermHeaderText("Suggestions:")
-    screen.SetSearchButtonText("search")
-    screen.SetClearButtonEnabled(false)
+    this._port = createObject("roMessagePort")
     
-    screen.Show() 
+    ' Member functions
+    this.search = SearchScreen_search
+    this._getSuggestions = _SearchScreen_getSuggestions
+    this._getMatches = _SearchScreen_getMatches
+
+    return this
+
+end function
+
+function SearchScreen_search(feed)
+
+    this = m
+
+    this._feed = feed
+
+    this._screen = createObject("roSearchScreen")
+
+    this._screen.setMessagePort(this._port) 
+    this._screen.setBreadcrumbText("", "Search")
+    this._screen.setSearchTermHeaderText("Suggestions:")
+    this._screen.setSearchButtonText("search")
+    this._screen.setClearButtonEnabled(false)
+    
+    this._screen.Show() 
 
     searchString = invalid
 
     while true 
-        msg = wait(0, screen.GetMessagePort()) 
+        msg = wait(0, this._screen.GetMessagePort()) 
 
         if type(msg) = "roSearchScreenEvent"
             if msg.isScreenClosed()
@@ -30,7 +46,7 @@ Function showSearchScreen(feed)
                 history.Clear()
             else if msg.isPartialResult()
                 searchString = msg.GetMessage()
-                screen.SetSearchTerms(getSuggestions(searchString))
+                this._screen.SetSearchTerms(this._getSuggestions(searchString))
             else if msg.isFullResult()
                 searchString = msg.GetMessage()
 
@@ -39,28 +55,32 @@ Function showSearchScreen(feed)
         endif
     endwhile 
 
-    return getMatches(searchString)
+    return this._getMatches(searchString)
 
-End Function
+end function
 
 ' Get a list of suggestions for a given search string
-Function getSuggestions(searchString)
+function _SearchScreen_getSuggestions(searchString)
+
+    this = m
 
     lSearchString = LCase(searchString)
     suggestions = []
 
-    for each feedItem in m.feed
-        if instr(LCase(feedItem.Title), lSearchString) > 0 then
-            suggestions.Push(feedItem.Title)
+    for each feedItem in this._feed
+        if instr(LCase(feedItem.title), lSearchString) > 0 then
+            suggestions.Push(feedItem.title)
         end if
     end for
 
     return suggestions
 
-End Function
+end function
 
 ' Get a list of matches for a given search string
-Function getMatches(searchString)
+Function _SearchScreen_getMatches(searchString)
+
+    this = m
 
     if searchString = invalid or searchString = "" then
         return []
@@ -69,8 +89,8 @@ Function getMatches(searchString)
     lSearchString = LCase(searchString)
     matches = []
 
-    for each feedItem in m.feed
-        if instr(LCase(feedItem.Title), lSearchString) > 0 then
+    for each feedItem in this._feed
+        if instr(LCase(feedItem.title), lSearchString) > 0 then
             matches.Push(feedItem)
         end if
     end for
