@@ -116,10 +116,10 @@ Sub analyticsOnStartup()
 
     if lastSessionDuration > 0 then
         lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0")
-        analyticsTrackEvent("App", "Shutdown", "", lastSessionDuration.ToStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.ToStr() }])
+        analyticsTrackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.ToStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.ToStr() }])
     end if
 
-    analyticsTrackEvent("App", "Start", "", "1", [])
+    analyticsTrackEvent("Tiny Desk", "Start", "", "1", [])
 
 End Sub
 
@@ -128,6 +128,7 @@ Sub analyticsCleanup()
     ' Just note the session duration. We wrote the number of playback events the
     ' last time we got one, and we won't send the actual event until the next
     ' startup.
+    print m.SessionTimer.TotalSeconds()
     RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
     m.SessionTimer = invalid
 

@@ -7,7 +7,7 @@ Sub Main()
     initAnalytics()
     analyticsOnStartup()
     showGridScreen()
-    analyticCleanup()
+    analyticsCleanup()
 
 End Sub
 

@@ -8,11 +8,17 @@ Function showVideoScreen(feedItem As Object) as Boolean
     port = CreateObject("roMessagePort")
     screen = CreateObject("roVideoScreen")
     screen.SetMessagePort(port)
-
+    
     watched = false
 
     position = loadPosition(feedItem)
     feedItem.PlayStart = position
+
+    if position > 0 then
+        analyticsTrackEvent("Tiny Desk", "Continue", "", feedItem.Title, [])
+    else
+        analyticsTrackEvent("Tiny Desk", "Start", "", feedItem.Title, [])
+    end if
 
     print "Video playback will begin at: " feedItem.PlayStart
 
@@ -32,8 +38,10 @@ Function showVideoScreen(feedItem As Object) as Boolean
             else if msg.isFullResult()
                 position = 0
                 savePosition(feedItem, position)
-
+    
                 watched = True
+                analyticsTrackEvent("Tiny Desk", "Finish", "", feedItem.Title, [])
+
                 exit while
             else if msg.isPartialResult()
                 ' If user watched more than 95% count video as watched
@@ -42,6 +50,9 @@ Function showVideoScreen(feedItem As Object) as Boolean
                     savePosition(feedItem, position)
 
                     watched = True
+                    analyticsTrackEvent("Tiny Desk", "Finish", "", feedItem.Title, [])
+                else
+                    analyticsTrackEvent("Tiny Desk", "Stop", "", feedItem.Title, [])
                 end if
             else if msg.isPlaybackPosition() then
                 position = msg.GetIndex()
