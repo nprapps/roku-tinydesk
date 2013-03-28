@@ -95,7 +95,7 @@ End Function
 ' Parse the video feed
 function fetchFeed()
 
-    feed = http_get_with_retry("http://apps.npr.org/nproku/feed.json")
+    feed = http_get_with_retry("http://apps.npr.org/roku-tinydesk/feed.json")
 
     return ParseJSON(feed)
 

@@ -61,14 +61,14 @@ End Function
 ' Save playback position
 Function savePosition(feedItem, position)
 
-    RegWrite(feedItem.id + "_position", position.toStr(), "nproku")
+    RegWrite(feedItem.id, position.toStr(), "position")
 
 End Function
 
 ' Load playback position
 Function loadPosition(feedItem) as Integer
 
-    position = RegRead(feedItem.Id + "_position", "nproku")
+    position = RegRead(feedItem.Id, "position")
     
     if position = Invalid then
         return 0

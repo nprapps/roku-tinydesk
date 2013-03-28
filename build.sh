@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ZIP_NAME="nproku.zip"
+ZIP_NAME="roku-tinydesk.zip"
 
 curl -s -S -F "mysubmit=Delete" -F "archive=" -F "passwd=" http://$ROKU_IP/plugin_install
 

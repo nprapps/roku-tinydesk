@@ -11,7 +11,7 @@ from dateutil.parser import parse
 import requests
 
 BITRATES = [200000, 500000, 1000000, 2000000]
-UPLOAD_CMD = 's3cmd -P --add-header=Cache-Control:max-age=5 --add-header=Content-encoding:gzip --guess-mime-type sync feed.json s3://apps.npr.org/nproku/'
+UPLOAD_CMD = 's3cmd -P --add-header=Cache-Control:max-age=5 --add-header=Content-encoding:gzip --guess-mime-type sync feed.json s3://apps.npr.org/roku-tinydesk/'
 
 class MLStripper(HTMLParser):
     def __init__(self):
