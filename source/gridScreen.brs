@@ -24,7 +24,6 @@ function GridScreen()
     ' Member functions
     this._initLists = _GridScreen_initLists
     this._refreshLists = _GridScreen_refreshLists
-    this._sortLastWatched = _GridScreen_sortLastWatched
 
     ' Setup
     this._screen.setMessagePort(this._port)
@@ -91,8 +90,65 @@ function GridScreen()
 
 end function
 
-' BubbleSort the feed by last watched
-function _GridScreen_sortLastWatched(list)
+
+' Initialize the video lists
+function _GridScreen_initLists()
+
+    this = m
+
+    for i = 0 to this._titles.count() - 1
+        this._lists[i] = []
+    end for
+
+    for each feedItem in this._feed 
+        feedItem.lastWatched = get_last_watched(feedItem)
+
+        if feedItem.lastWatched <> invalid then
+            this._lists[this.RECENT].Push(feedItem)
+        end if
+    end for
+    
+    this._lists[this.ALL] = this._feed
+    this._lists[this.RECENT] = sortByLastWatched(this._lists[this.RECENT])
+    this._lists[this.SEARCH] = []
+
+    this._refreshLists()
+
+    this._screen.Show()
+
+end function
+
+' Render the grid lists, but only those with data
+function _GridScreen_refreshLists()
+
+    this = m
+
+    this._visibleTitles = [this._titles[this.ALL]]
+    this._visibleLists = [this._lists[this.ALL]]
+
+    if this._lists[this.RECENT].Count() > 0 then
+        this._visibleTitles.Push(this._titles[this.RECENT])
+        this._visibleLists.Push(this._lists[this.RECENT])
+    end if
+
+    if this._lists[this.SEARCH].Count() > 0 then
+        this._visibleTitles.Push(this._titles[this.SEARCH])
+        this._visibleLists.Push(this._lists[this.SEARCH])
+    end if
+
+    this._screen.SetupLists(this._visibleTitles.Count())
+    this._screen.SetListNames(this._visibleTitles)
+
+    for i = 0 to this._visibleLists.Count() - 1
+        this._screen.SetContentList(i, this._visibleLists[i])
+    end for
+
+    this._screen.Show()
+
+end function
+
+' BubbleSort a feed of videos by last watched
+function sortByLastWatched(list)
 
     swapped = true
 
@@ -114,58 +170,6 @@ function _GridScreen_sortLastWatched(list)
     end while
 
     return list
-
-end function
-
-' Initialize the video lists
-function _GridScreen_initLists()
-
-    for i = 0 to m._titles.count() - 1
-        m._lists[i] = []
-    end for
-
-    for each feedItem in m._feed 
-        feedItem.lastWatched = get_last_watched(feedItem)
-
-        if feedItem.lastWatched <> invalid then
-            m._lists[m.RECENT].Push(feedItem)
-        end if
-    end for
-    
-    m._lists[m.ALL] = m._feed
-    m._lists[m.RECENT] = m._sortLastWatched(m._lists[m.RECENT])
-    m._lists[m.SEARCH] = []
-
-    m._refreshLists()
-
-    m._screen.Show()
-
-end function
-
-' Render the grid lists, but only those with data
-function _GridScreen_refreshLists()
-
-    m._visibleTitles = [m._titles[m.ALL]]
-    m._visibleLists = [m._lists[m.ALL]]
-
-    if m._lists[m.RECENT].Count() > 0 then
-        m._visibleTitles.Push(m._titles[m.RECENT])
-        m._visibleLists.Push(m._lists[m.RECENT])
-    end if
-
-    if m._lists[m.SEARCH].Count() > 0 then
-        m._visibleTitles.Push(m._titles[m.SEARCH])
-        m._visibleLists.Push(m._lists[m.SEARCH])
-    end if
-
-    m._screen.SetupLists(m._visibleTitles.Count())
-    m._screen.SetListNames(m._visibleTitles)
-
-    for i = 0 to m._visibleLists.Count() - 1
-        m._screen.SetContentList(i, m._visibleLists[i])
-    end for
-
-    m._screen.Show()
 
 end function
 
