@@ -54,8 +54,10 @@ To connect to your Roku for debugging:
 $ telnet $ROKU_IP 8085
 ```
 
-Analytics events
+Google Analytics
 ----------------
+
+The following events are tracked in Google Analytics:
 
 |Category|Action|Label|
 |--------|------|-----|
@@ -65,6 +67,14 @@ Analytics events
 |Tiny Desk|Continue|Title|
 |Tiny Desk|Finish|Title|
 |Tiny Desk|Stop|Title|
+
+TODO:
+
+* Search
+* Play time
+* Number of videos watched
+* Rewatched
+* Paused
 
 Code conventions
 ----------------
