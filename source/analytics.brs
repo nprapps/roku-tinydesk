@@ -31,7 +31,9 @@ Function initAnalytics()
 
     obj = CreateObject("roAssociativeArray")
 
-    m.Account = "UA-5828686-4"
+    m.Account = "UA-39645840-3"
+    m.AppName = "roku-tinydesk"
+    m.Domain = "apps.npr.org"
     m.NumEvents = 0
     m.NumPlaybackEvents = 0
 
@@ -44,9 +46,9 @@ Function initAnalytics()
     m.BaseUrl = m.BaseUrl + "&utmul=en-us"
     m.BaseUrl = m.BaseUrl + "&utmje=0"
     m.BaseUrl = m.BaseUrl + "&utmfl=-"
-    m.BaseUrl = m.BaseUrl + "&utmdt=tinydesk"
-    m.BaseUrl = m.BaseUrl + "&utmp=tinydesk"
-    m.BaseUrl = m.BaseUrl + "&utmhn=apps.npr.org"
+    m.BaseUrl = m.BaseUrl + "&utmdt=" + xfer.Escape(m.AppName)
+    m.BaseUrl = m.BaseUrl + "&utmp=" + xfer.Escape(m.AppName)
+    m.BaseUrl = m.BaseUrl + "&utmhn=" + xfer.Escape(m.Domain)
     m.BaseUrl = m.BaseUrl + "&utmr=-"
     'm.BaseUrl = m.BaseUrl + "&utmvid=" + xfer.Escape(GetGlobal("rokuUniqueID"))
 
@@ -96,11 +98,6 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
 
     m.NumEvents = m.NumEvents + 1
 
-    request = CreateObject("roUrlTransfer")
-    request.EnableEncodings(true)
-    context = CreateObject("roAssociativeArray")
-    context.requestType = "analytics"
-
     url = m.BaseUrl
     url = url + "&utms=" + m.NumEvents.ToStr()
     url = url + "&utmn=" + GARandNumber(1000000000,9999999999).ToStr()   'Random Request Number
@@ -108,9 +105,8 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
     url = url + "&utmt=event"
     url = url + "&utme=" + analyticsFormatEvent(category, action, label, value) + analyticsFormatCustomVars(customVars)
 
-    print "Final analytics URL: " + url
-    request.SetUrl(url)
-    request.AsyncGetToString()
+    print "Analytics URL: " + url
+    http_get_async_ignore_response(url)
 
 End Sub
 

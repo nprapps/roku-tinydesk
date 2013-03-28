@@ -46,3 +46,25 @@ Function http_get_with_retry(url, timeout=1500, retries=5) as String
     return response 
 End Function
 
+Function http_get_async_ignore_response(url)
+
+    port = CreateObject("roMessagePort")
+    xfer = create_transfer(port, url)
+
+    while true
+        if xfer.AsyncGetToString() then
+            event = wait(100, port)
+
+            if type(event) = "roUrlEvent"
+                response = event.GetString()
+                print response
+                exit while
+            elseif event = invalid
+                xfer.AsyncCancel()
+                print cancelling
+                exit while
+            endif
+        endif
+    end while
+
+End Function
