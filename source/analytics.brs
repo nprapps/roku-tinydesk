@@ -112,11 +112,11 @@ End Sub
 
 Sub analyticsOnStartup()
 
-    lastSessionDuration = RegRead("session_duration", "analytics", "0").toint()
+    lastSessionDuration = RegRead("session_duration", "analytics", "0").toInt()
 
     if lastSessionDuration > 0 then
-        lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0")
-        analyticsTrackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.ToStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.ToStr() }])
+        lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0").toInt()
+        analyticsTrackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.toStr() }])
     end if
 
     analyticsTrackEvent("Tiny Desk", "Start", "", "1", [])

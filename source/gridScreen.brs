@@ -2,79 +2,86 @@
 ' The main grid/list screen
 '
 
-' Run the grid screen
-Function showGridScreen()
+' Grid screen constructor
+function GridScreen()
 
-    m.ALL = 0
-    m.RECENT = 1
-    m.SEARCH = 2
-    m.titles = ["All", "Recently watched", "Search results"]
-    m.lists = []
+    ' Member vars
+    this = {}
+    
+    this.ALL = 0
+    this.RECENT = 1
+    this.SEARCH = 2
 
-    ' Populated by initLists
-    m.visibleTitles = []
-    m.visibleLists = []
+    this._port = createObject("roMessagePort")
+    this._screen = createObject("roGridScreen")
 
-    port = CreateObject("roMessagePort")
-    screen = CreateObject("roGridScreen")
-    screen.SetMessagePort(port)
+    this._feed = []
+    this._titles = ["All", "Recently watched", "Search results"]
+    this._lists = []
+    this._visibleTitles = [] 
+    this._visibleLists = []
+    
+    ' Member functions
+    this._initLists = _GridScreen_initLists
+    this._refreshLists = _GridScreen_refreshLists
+    this._sortLastWatched = _GridScreen_sortLastWatched
 
-    screen.SetBreadcrumbText("", "Press * to search            ")
-    screen.SetGridStyle("flat-landscape")
-    screen.SetDisplayMode("photo-fit")
+    ' Setup
+    this._screen.setMessagePort(this._port)
+
+    this._screen.setBreadcrumbText("", "Press * to search            ")
+    this._screen.setGridStyle("flat-landscape")
+    this._screen.setDisplayMode("photo-fit")
     
     ' Always setup at least one list (keeps tooltips from appearing in the wrong place)
-    screen.SetupLists(1)
+    this._screen.setupLists(1)
 
-    screen.Show()
+    this._screen.show()
+    this._screen.showMessage("Retrieving...")
 
-    screen.ShowMessage("Retrieving...")
+    this._feed = fetchFeed()
+    this._initLists()
 
-    feed = fetchFeed()
-    initLists(screen, feed)
-
-    screen.ClearMessage()
-
-    ' TODO: if there is an unwatched video, play it immediately
+    this._screen.ClearMessage()
 
     while true
-        msg = wait(0, screen.GetMessagePort())
+        msg = wait(0, this._port)
 
         if type(msg) = "roGridScreenEvent" then
 
             if msg.isListItemSelected() then
-                selected_list = msg.GetIndex()
-                selected_item = msg.GetData()
-                feedItem = m.visibleLists[selected_list][selected_item]
+                selected_list = msg.getIndex()
+                selected_item = msg.getData()
+                feedItem = this._visibleLists[selected_list][selected_item]
 
                 watched = showVideoScreen(feedItem)
                 set_last_watched(feedItem)
 
-                if watched and selected_list <> m.WATCHED then
+                if watched and selected_list <> this.WATCHED then
                     mark_as_watched(feedItem)
                 end if
 
                 ' Remove vid from recent list if it already exists
-                for i = 0 to m.lists[m.RECENT].count() - 1
-                    if m.lists[m.RECENT][i].Id = feedItem.Id then
-                        m.lists[m.RECENT].delete(i)
+                for i = 0 to this._lists[this.RECENT].count() - 1
+                    if this._lists[this.RECENT][i].Id = feedItem.Id then
+                        this._lists[this.RECENT].delete(i)
                         exit for
                     end if
                 end for
                 
                 ' Add vid to recent list
-                m.lists[m.RECENT].unshift(feedItem)
+                this._lists[this.RECENT].unshift(feedItem)
 
-                refreshLists(screen)
+                this._refreshLists()
 
-                screen.SetFocusedListItem(m.RECENT, 0)
+                this._screen.setFocusedListItem(this.RECENT, 0)
             else if msg.isRemoteKeyPressed() then
-                if msg.GetIndex() = 10 then
-                    m.lists[m.SEARCH] = showSearchScreen(feed)
+                if msg.getIndex() = 10 then
+                    this._lists[this.SEARCH] = showSearchScreen(feed)
                     
-                    refreshLists(screen)
+                    this._refreshLists()
 
-                    screen.SetFocusedListItem(m.SEARCH, 0)
+                    this._screen.setFocusedListItem(this.SEARCH, 0)
                 end if
             else if msg.isScreenClosed() then
                 exit while
@@ -82,99 +89,90 @@ Function showGridScreen()
         end if
     end while
 
-End Function
-
-' Parse the video feed
-function fetchFeed()
-
-    feed = http_get_with_retry("http://apps.npr.org/roku-tinydesk/feed.json")
-
-    return ParseJSON(feed)
-
 end function
 
 ' BubbleSort the feed by last watched
-Function sortLastWatched(feed)
+function _GridScreen_sortLastWatched(list)
 
     swapped = true
 
     while swapped = true
         swapped = false
 
-        for i = 0 to feed.Count() - 1
-            if feed[i + 1] = invalid then
+        for i = 0 to list.Count() - 1
+            if list[i + 1] = invalid then
                 exit for
             end if
 
-            if feed[i].lastWatched < feed[i + 1].lastWatched then
-                temp = feed[i]
-                feed[i] = feed[i + 1]
-                feed[i + 1] = temp
+            if list[i].lastWatched < list[i + 1].lastWatched then
+                temp = list[i]
+                list[i] = list[i + 1]
+                list[i + 1] = temp
                 swapped = true
             end if
         end for
     end while
 
-    return feed
+    return list
 
-End Function
+end function
 
 ' Initialize the video lists
-Function initLists(screen, feed)
+function _GridScreen_initLists()
 
-    for i = 0 to m.titles.count() - 1
-        m.lists[i] = []
+    for i = 0 to m._titles.count() - 1
+        m._lists[i] = []
     end for
 
-    for each feedItem in feed
+    for each feedItem in m._feed 
         feedItem.lastWatched = get_last_watched(feedItem)
 
         if feedItem.lastWatched <> invalid then
-            m.lists[m.RECENT].Push(feedItem)
+            m._lists[m.RECENT].Push(feedItem)
         end if
     end for
     
-    m.lists[m.ALL] = feed
-    m.lists[m.RECENT] = sortLastWatched(m.lists[m.RECENT])
-    m.lists[m.SEARCH] = []
+    m._lists[m.ALL] = m._feed
+    m._lists[m.RECENT] = m._sortLastWatched(m._lists[m.RECENT])
+    m._lists[m.SEARCH] = []
 
-    refreshLists(screen)
+    m._refreshLists()
 
-    screen.Show()
+    m._screen.Show()
 
-End Function
+end function
 
 ' Render the grid lists, but only those with data
-Function refreshLists(screen)
+function _GridScreen_refreshLists()
 
-    m.visibleTitles = [m.titles[m.ALL]]
-    m.visibleLists = [m.lists[m.ALL]]
+    m._visibleTitles = [m._titles[m.ALL]]
+    m._visibleLists = [m._lists[m.ALL]]
 
-    if m.lists[m.RECENT].Count() > 0 then
-        m.visibleTitles.Push(m.titles[m.RECENT])
-        m.visibleLists.Push(m.lists[m.RECENT])
+    if m._lists[m.RECENT].Count() > 0 then
+        m._visibleTitles.Push(m._titles[m.RECENT])
+        m._visibleLists.Push(m._lists[m.RECENT])
     end if
 
-    if m.lists[m.SEARCH].Count() > 0 then
-        m.visibleTitles.Push(m.titles[m.SEARCH])
-        m.visibleLists.Push(m.lists[m.SEARCH])
+    if m._lists[m.SEARCH].Count() > 0 then
+        m._visibleTitles.Push(m._titles[m.SEARCH])
+        m._visibleLists.Push(m._lists[m.SEARCH])
     end if
 
-    screen.SetupLists(m.visibleTitles.Count())
-    screen.SetListNames(m.visibleTitles)
+    m._screen.SetupLists(m._visibleTitles.Count())
+    m._screen.SetListNames(m._visibleTitles)
 
-    for i = 0 to m.visibleLists.Count() - 1
-        screen.SetContentList(i, m.visibleLists[i])
+    for i = 0 to m._visibleLists.Count() - 1
+        m._screen.SetContentList(i, m._visibleLists[i])
     end for
 
-    screen.Show()
+    m._screen.Show()
 
-End Function
+end function
 
 ' Set last watch timestamp in the registry
 function set_last_watched(feedItem)
 
-    now = CreateObject("roDateTime").asSeconds().toStr()
+    now = createObject("roDateTime").asSeconds().toStr()
     RegWrite(feedItem.Id, now, "recent")
 
 end function
@@ -189,6 +187,7 @@ function get_last_watched(feedItem)
     end if
     
     return lastWatched.toInt()
+
 end function
 
 ' Mark a video watched in the registry
@@ -204,6 +203,15 @@ function is_watched(feedItem)
     read = RegRead(feedItem.Id, "watched")
 
     return read = "true"
+
+end function
+
+' Fetch and parse the video feed
+function fetchFeed()
+
+    feed = http_get_with_retry("http://apps.npr.org/roku-tinydesk/feed.json")
+
+    return ParseJSON(feed)
 
 end function
 

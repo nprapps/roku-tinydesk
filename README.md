@@ -53,3 +53,22 @@ To connect to your Roku for debugging:
 ```
 $ telnet $ROKU_IP 8085
 ```
+
+Code conventions
+----------------
+
+Because Roku dev lacks strong (or any) code conventions, I'm defining my own:
+
+* Objects/Constructors: `TitleCase`
+* Members or public functions: `camelCase`
+* Public member functions: `GridScreen.refreshLists = GridScreen_refreshLists`
+* Private member functions `GridScreen._initLists = _GridScreen_initLists`
+* Private member vars: `_underscorePrefixed`
+* Constants: `UPPERCASE`
+* Keywords: lowercase, e.g. `function` and `end function`
+
+All rules for function names also apply when calling case-insensitive built-in functions, e.g. `mid()` not `Mid()` and `count()` not `Count()`
+
+Leave a line of whitespace after `function` and before `end function`
+
+Comments describing a functions purpose should *precede* the function defintion.
