@@ -2,8 +2,18 @@
 ' The main grid/list screen
 '
 
-' Setup the grid screen
-Function preShowGridScreen() As Object
+' Run the grid screen
+Function showGridScreen()
+
+    m.ALL = 0
+    m.RECENT = 1
+    m.SEARCH = 2
+    m.titles = ["All", "Recently watched", "Search results"]
+    m.lists = []
+
+    ' Populated by initLists
+    m.visibleTitles = []
+    m.visibleLists = []
 
     port = CreateObject("roMessagePort")
     screen = CreateObject("roGridScreen")
@@ -15,23 +25,6 @@ Function preShowGridScreen() As Object
     
     ' Always setup at least one list (keeps tooltips from appearing in the wrong place)
     screen.SetupLists(1)
-
-    return screen
-
-End Function
-
-' Run the grid screen
-Function showGridScreen(screen as Object) as Integer
-
-    m.ALL = 0
-    m.RECENT = 1
-    m.SEARCH = 2
-    m.titles = ["All", "Recently watched", "Search results"]
-    m.lists = []
-
-    ' Populated by initLists
-    m.visibleTitles = []
-    m.visibleLists = []
 
     screen.Show()
 
@@ -48,7 +41,6 @@ Function showGridScreen(screen as Object) as Integer
         msg = wait(0, screen.GetMessagePort())
 
         if type(msg) = "roGridScreenEvent" then
-            print "showGridScreen | msg = "; msg.GetMessage() " | index = "; msg.GetIndex()
 
             if msg.isListItemSelected() then
                 selected_list = msg.GetIndex()
@@ -85,7 +77,7 @@ Function showGridScreen(screen as Object) as Integer
                     screen.SetFocusedListItem(m.SEARCH, 0)
                 end if
             else if msg.isScreenClosed() then
-                return -1
+                exit while
             end if
         end if
     end while

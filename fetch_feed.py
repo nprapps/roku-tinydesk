@@ -95,6 +95,8 @@ def main():
     with gzip.open('feed.json', 'wb') as f:
         f.write(json.dumps(output))
 
+    print 'Deploying to S3'
+
     subprocess.Popen(shlex.split(UPLOAD_CMD), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if __name__ == '__main__':

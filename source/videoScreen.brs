@@ -29,9 +29,6 @@ Function showVideoScreen(feedItem As Object) as Boolean
             else if msg.isRequestFailed()
                 ' TODO
                 print "Video request failure: "; msg.GetIndex(); " " msg.GetData()
-            else if msg.isStatusMessage()
-                ' TODO
-                print "Video status: "; msg.GetIndex(); " " msg.GetData()
             else if msg.isFullResult()
                 position = 0
                 savePosition(feedItem, position)
