@@ -55,6 +55,8 @@ function SearchScreen_search(feed)
         endif
     endwhile 
 
+    this._screen.Close()
+
     return this._getMatches(searchString)
 
 end function

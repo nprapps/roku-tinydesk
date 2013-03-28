@@ -75,6 +75,8 @@ function VideoScreen_play(contentItem) as Boolean
         end if
     end while
 
+    this._screen.close()
+
     return watched
 
 End Function

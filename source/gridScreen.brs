@@ -24,6 +24,7 @@ function GridScreen() as Object
     this._visibleLists = []
     
     ' Member functions
+    this._watch = _GridScreen_watch
     this._initLists = _GridScreen_initLists
     this._refreshLists = _GridScreen_refreshLists
 
@@ -53,34 +54,18 @@ function GridScreen() as Object
             selected_item = msg.getData()
             contentItem = this._visibleLists[selected_list][selected_item]
 
-            watched = this._videoScreen.play(contentItem)
-            setLastWatched(contentItem)
-
-            if watched and selected_list <> this.WATCHED then
-                markAsWatched(contentItem)
-            end if
-
-            ' Remove vid from recent list if it already exists
-            for i = 0 to this._lists[this.RECENT].count() - 1
-                if this._lists[this.RECENT][i].id = contentItem.id then
-                    this._lists[this.RECENT].delete(i)
-                    exit for
-                end if
-            end for
-            
-            ' Add vid to recent list
-            this._lists[this.RECENT].unshift(contentItem)
-
-            this._refreshLists()
-
-            this._screen.setFocusedListItem(this.RECENT, 0)
+            this._watch(contentItem)
         else if msg.isRemoteKeyPressed() then
             if msg.getIndex() = 10 then
                 this._lists[this.SEARCH] = this._searchScreen.search(this._feed)
-                
-                this._refreshLists()
 
-                this._screen.setFocusedListItem(this.SEARCH, 0)
+                if this._lists[this.SEARCH].count() = 1 then
+                    contentItem = this._lists[this.SEARCH][0]
+                    this._watch(contentItem)
+                else
+                    this._refreshLists()
+                    this._screen.setFocusedListItem(this.SEARCH, 0)
+                end if
             end if
         else if msg.isScreenClosed() then
             exit while
@@ -91,6 +76,34 @@ function GridScreen() as Object
 
 end function
 
+' Watch a video selected from the grid
+function _GridScreen_watch(contentItem)
+
+    this = m
+
+    watched = this._videoScreen.play(contentItem)
+    setLastWatched(contentItem)
+
+    if watched and selected_list <> this.WATCHED then
+        markAsWatched(contentItem)
+    end if
+
+    ' Remove vid from recent list if it already exists
+    for i = 0 to this._lists[this.RECENT].count() - 1
+        if this._lists[this.RECENT][i].id = contentItem.id then
+            this._lists[this.RECENT].delete(i)
+            exit for
+        end if
+    end for
+    
+    ' Add vid to recent list
+    this._lists[this.RECENT].unshift(contentItem)
+
+    this._refreshLists()
+
+    this._screen.setFocusedListItem(this.RECENT, 0)
+
+end function
 
 ' Initialize the video lists
 function _GridScreen_initLists()
