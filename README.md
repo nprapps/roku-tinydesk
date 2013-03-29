@@ -59,22 +59,14 @@ Google Analytics
 
 The following events are tracked in Google Analytics:
 
-|Category|Action|Label|
-|--------|------|-----|
-|Tiny Desk|Startup|| 
-|Tiny Desk|Shutdown|| 
-|Tiny Desk|Start|Title|
-|Tiny Desk|Continue|Title|
-|Tiny Desk|Finish|Title|
-|Tiny Desk|Stop|Title|
-
-TODO:
-
-* Search
-* Play time
-* Number of videos watched
-* Rewatched
-* Paused
+|Category|Action|Label|Value|
+|--------|------|-----|-----|
+|Tiny Desk|Startup|||
+|Tiny Desk|Shutdown||| 
+|Tiny Desk|Start|Title||
+|Tiny Desk|Continue|Title||
+|Tiny Desk|Finish|Title||
+|Tiny Desk|Stop|Title||
 
 Code conventions
 ----------------
