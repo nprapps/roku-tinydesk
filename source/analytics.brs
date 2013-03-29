@@ -38,7 +38,7 @@ function Analytics() as Object
     this.numPlaybackEvents = 0
     this.baseUrl = ""
     
-    this.sessionTimer = CreateObject("roTimespan")
+    this.sessionTimer = createObject("roTimespan")
 
     this.startup = Analytics_startup
     this.shutdown = Analytics_shutdown
@@ -48,7 +48,7 @@ function Analytics() as Object
     this._random = _Analytics_random
 
     xfer = createObject("roUrlTransfer")
-    device = createObjecT("roDeviceInfo")
+    device = createObject("roDeviceInfo")
     screenSize = device.getDisplaySize()
 
     this.baseUrl = "http://www.google-analytics.com/__utm.gif"
@@ -65,12 +65,12 @@ function Analytics() as Object
     this.baseUrl = this.baseUrl + "&utmvid=" + xfer.Escape(device.getDeviceUniqueId())
 
     ' Initialize our "cookies"
-    domainHash = "102995024" ' should be set by Google, but hardcode to something
-    visitorID = RegRead("AnalyticsID", "analytics", invalid)
+    domainHash = "102995024"
+    visitorId = RegRead("AnalyticsID", "analytics", invalid)
 
-    if visitorID = invalid then
-        visitorID = this._random(1000000000, 9999999999).toStr()
-        RegWrite("AnalyticsID", visitorID, "analytics")
+    if visitorId = invalid then
+        visitorId = this._random(1000000000, 9999999999).toStr()
+        RegWrite("AnalyticsID", visitorId, "analytics")
     end if
 
     timestamp = createObject("roDateTime")
@@ -80,7 +80,10 @@ function Analytics() as Object
 
     RegWrite("PrevTimestamp", curTimestamp, "analytics")
 
-    if prevTimestamp = invalid then prevTimestamp = curTimestamp
+    if prevTimestamp = invalid then
+        prevTimestamp = curTimestamp
+    end if
+
     if firstTimestamp = invalid then
         RegWrite("FirstTimestamp", curTimestamp, "analytics")
         firstTimestamp = curTimestamp
@@ -89,7 +92,7 @@ function Analytics() as Object
     numSessions = RegRead("NumSessions", "analytics", "0").toint() + 1
     RegWrite("NumSessions", numSessions.toStr(), "analytics")
 
-    this.baseUrl = this.baseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.toStr()
+    this.baseUrl = this.baseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorId + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.toStr()
     this.baseUrl = this.baseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
     this.baseUrl = this.baseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
 
@@ -116,7 +119,7 @@ function Analytics_trackEvent(category, action, label, value, customVars)
 
     url = this.baseUrl
     url = url + "&utms=" + this.numEvents.toStr()
-    url = url + "&utmn=" + this._random(1000000000,9999999999).toStr()   'Random Request Number
+    url = url + "&utmn=" + this._random(1000000000, 9999999999).toStr()
     url = url + "&utmac=" + this.account
     url = url + "&utmt=event"
     url = url + "&utme=" + this._formatEvent(category, action, label, value) + this._formatCustomVars(customVars)
@@ -126,6 +129,7 @@ function Analytics_trackEvent(category, action, label, value, customVars)
 
 end function
 
+' Do initial analytics reporting
 function Analytics_startup()
 
     this = m 
@@ -141,7 +145,7 @@ function Analytics_startup()
 
 end function
 
-' Do final analytics processing
+' Do final analytics reporting
 function Analytics_shutdown()
 
     this = m
@@ -150,26 +154,32 @@ function Analytics_shutdown()
 
 end function
 
+' Format event for request string 
 Function _Analytics_formatEvent(category, action, label, value) As String
 
-    xfer = CreateObject("roUrlTransfer")
+    xfer = createObject("roUrlTransfer")
 
     event = "5(" + xfer.Escape(category) + "*" + xfer.Escape(action)
+    
     if label <> invalid then
         event = event + "*" + xfer.Escape(label)
     end if
+    
     if value <> invalid then
         event = event + ")(" + value
     end if
+
     event = event + ")"
 
     return event
 
 End Function
 
+' Format custom variables for request string
 Function _Analytics_formatCustomVars(vars) As String
-    xfer = CreateObject("roUrlTransfer")
-    vars = CreateObject("roArray", 5, false)
+
+    xfer = createObject("roUrlTransfer")
+    vars = createObject("roArray", 5, false)
 
     if vars.count() = 0 then return ""
 
@@ -211,6 +221,7 @@ Function _Analytics_formatCustomVars(vars) As String
 
 End Function
 
+' Generate a random number suitable for analytics
 Function _Analytics_random(num_min As Integer, num_max As Integer) As Integer
 
     Return (RND(0) * (num_max - num_min)) + num_min
