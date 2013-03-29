@@ -77,7 +77,7 @@ function _SearchScreen_getSuggestions(searchString)
         end if
     end for
 
-    return suggestions
+    return sort(suggestions)
 
 end function
 
@@ -99,7 +99,7 @@ function _SearchScreen_getMatches(searchString)
         end if
     end for
 
-    return matches 
+    return sortBy(matches, "title")
 
 end function
 

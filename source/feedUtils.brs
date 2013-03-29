@@ -11,32 +11,6 @@ function fetchFeed() as Object
 
 end function
 
-' BubbleSort a list of videos by last watched
-function sortByLastWatched(list) as Object 
-
-    swapped = true
-
-    while swapped = true
-        swapped = false
-
-        for i = 0 to list.Count() - 1
-            if list[i + 1] = invalid then
-                exit for
-            end if
-
-            if list[i].lastWatched < list[i + 1].lastWatched then
-                temp = list[i]
-                list[i] = list[i + 1]
-                list[i + 1] = temp
-                swapped = true
-            end if
-        end for
-    end while
-
-    return list
-
-end function
-
 ' Set last watch timestamp in the registry
 function setLastWatched(contentItem)
 

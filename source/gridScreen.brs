@@ -115,15 +115,15 @@ function _GridScreen_initLists()
     end for
 
     for each contentItem in this._feed 
-        contentItem.lastWatched = getLastWatched(contentItem)
+        contentItem["lastWatched"] = getLastWatched(contentItem)
 
-        if contentItem.lastWatched <> invalid then
+        if contentItem["lastWatched"] <> invalid then
             this._lists[this.RECENT].Push(contentItem)
         end if
     end for
     
     this._lists[this.ALL] = this._feed
-    this._lists[this.RECENT] = sortByLastWatched(this._lists[this.RECENT])
+    this._lists[this.RECENT] = sortBy(this._lists[this.RECENT], "lastWatched")
     this._lists[this.SEARCH] = []
 
     this._refreshLists()
