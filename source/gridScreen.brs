@@ -12,26 +12,34 @@ function GridScreen() as Object
     this.RECENT = 1
     this.SEARCH = 2
 
+    this.SEARCH_ITEM = {
+        id: "search",
+        title: "Search",
+        description: "Search for an artist by name.",
+        sdPosterUrl: "http://apps.npr.org/roku-tinydesk/magnifying_glass.png",
+        hdPosterUrl: "http://apps.npr.org/roku-tinydesk/magnifying_glass.png"
+    }
+
     this._port = createObject("roMessagePort")
     this._screen = createObject("roGridScreen")
     this._videoScreen = VideoScreen()
     this._searchScreen = SearchScreen()
 
     this._feed = []
-    this._titles = ["All", "Recently watched", "Search results"]
+    this._titles = ["All", "Recently watched", "Search"]
     this._lists = []
     this._visibleTitles = [] 
     this._visibleLists = []
     
     ' Member functions
     this._watch = _GridScreen_watch
+    this._search = _GridScreen_search
     this._initLists = _GridScreen_initLists
     this._refreshLists = _GridScreen_refreshLists
 
     ' Setup
     this._screen.setMessagePort(this._port)
 
-    this._screen.setBreadcrumbText("", "Press * to search            ")
     this._screen.setGridStyle("flat-landscape")
     this._screen.setDisplayMode("photo-fit")
     
@@ -54,18 +62,14 @@ function GridScreen() as Object
             selected_item = msg.getData()
             contentItem = this._visibleLists[selected_list][selected_item]
 
-            this._watch(contentItem)
+            if contentItem.id = "search" then
+                this._search()
+            else
+                this._watch(contentItem)
+            end if
         else if msg.isRemoteKeyPressed() then
             if msg.getIndex() = 10 then
-                this._lists[this.SEARCH] = this._searchScreen.search(this._feed)
-
-                if this._lists[this.SEARCH].count() = 1 then
-                    contentItem = this._lists[this.SEARCH][0]
-                    this._watch(contentItem)
-                else
-                    this._refreshLists()
-                    this._screen.setFocusedListItem(this.SEARCH, 0)
-                end if
+                this._search()
             end if
         else if msg.isScreenClosed() then
             exit while
@@ -105,6 +109,24 @@ function _GridScreen_watch(contentItem)
 
 end function
 
+' Execute a search
+function _GridScreen_search()
+
+    this = m
+
+    this._lists[this.SEARCH] = this._searchScreen.search(this._feed)
+    this._lists[this.SEARCH].unshift(this.SEARCH_ITEM)
+
+    if this._lists[this.SEARCH].count() = 1 then
+        contentItem = this._lists[this.SEARCH][0]
+        this._watch(contentItem)
+    else
+        this._refreshLists()
+        this._screen.setFocusedListItem(this.SEARCH, 1)
+    end if
+
+end function
+
 ' Initialize the video lists
 function _GridScreen_initLists()
 
@@ -124,7 +146,7 @@ function _GridScreen_initLists()
     
     this._lists[this.ALL] = this._feed
     this._lists[this.RECENT] = sortBy(this._lists[this.RECENT], "lastWatched")
-    this._lists[this.SEARCH] = []
+    this._lists[this.SEARCH] = [this.SEARCH_ITEM]
 
     this._refreshLists()
     this._screen.setFocusedListItem(this.ALL, 0)
