@@ -68,7 +68,7 @@ The following events are tracked in Google Analytics:
 |Tiny Desk|Finish|`title`||
 |Tiny Desk|Stop|`title`||
 
-**Note:** The *Shutdown* doesn't fire until the next time the application is run, because there is no really shutdown event in a Roku app. `session_duration` will always be approximate. 
+**Note:** The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. `session_duration` will always be approximate. 
 
 Code conventions
 ----------------
