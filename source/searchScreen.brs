@@ -19,6 +19,7 @@ end function
 function SearchScreen_search(feed)
 
     this = m
+    globals = getGlobalAA()
 
     this._feed = feed
 
@@ -48,6 +49,8 @@ function SearchScreen_search(feed)
                 this._screen.SetSearchTerms(this._getSuggestions(searchString))
             else if msg.isFullResult()
                 searchString = msg.GetMessage()
+
+                globals.analytics.trackEvent("Tiny Desk", "Search", searchString, "", [])
 
                 exit while
             endif

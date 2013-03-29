@@ -33,6 +33,8 @@ def main():
     output = []
     page = 0
 
+    missing_mp4s = ''
+
     while True: 
         print 'Fetching page %i' % page
         response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&startNum=%i&numResults=50' % (os.environ['NPR_API_KEY'], page * 50))
@@ -75,6 +77,9 @@ def main():
 
             if 'mp4' not in story['multimedia'][0]['format']:
                 print '--> No mp4 video, skipping!'
+
+                missing_mp4s += '%s, %s\n' % (item['id'], item['title'])
+                
                 continue
 
             video_url = story['multimedia'][0]['format']['mp4']['$text']
@@ -96,6 +101,9 @@ def main():
 
     with gzip.open('feed.json', 'wb') as f:
         f.write(json.dumps(output))
+
+    with open('missing_mp4s.txt', 'w') as f:
+        f.write(missing_mp4s)
 
     print 'Deploying to S3'
 
