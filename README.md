@@ -92,7 +92,7 @@ Leave a line of whitespace after `function` and before `end function`
 
 Comments describing a functions purpose should *precede* the function defintion.
 
-In class constructors define the class object as `this`. In member functions redefine the class object as `this = m`.
+In class constructors define the class object as `this`. In member functions redefine the class object as `this = m`. **Never** use `m` to refer to the global namespace.
 
 Never use `sub`. Always use `function`.
 
