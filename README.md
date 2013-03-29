@@ -66,10 +66,12 @@ The following events are tracked in Google Analytics:
 |Tiny Desk|Start|`title`||
 |Tiny Desk|Continue|`title`||
 |Tiny Desk|Finish|`title`||
-|Tiny Desk|Stop|`title`||
+|Tiny Desk|Stop|`title`|`playtime`|
 |Tiny Desk|Search|`term`||
 
 **Note:** The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. `session_duration` will always be approximate. 
+
+**Note:** The *Stop* action is reported alongside the *Finish* action when a video is completed, for purposes of tracking playtimes.
 
 Code conventions
 ----------------

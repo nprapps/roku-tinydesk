@@ -27,7 +27,7 @@ function VideoScreen_play(contentItem) as Boolean
 
     watched = false
     position = loadPosition(contentItem)
-    contentItem.playStart = this._position
+    contentItem.playStart = position
 
     if position > 0 then
         globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [])
@@ -54,10 +54,16 @@ function VideoScreen_play(contentItem) as Boolean
             savePosition(contentItem, position)
 
             watched = True
+            playtime = position - contentItem.playStart
+
+            globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [])
             globals.analytics.trackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
 
             exit while
         else if msg.isPartialResult()
+            playtime = position - contentItem.playStart
+            globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [])
+
             ' If user watched more than 95% count video as watched
             if position >= int(contentItem.Length * 0.95) then
                 position = 0
@@ -65,8 +71,6 @@ function VideoScreen_play(contentItem) as Boolean
 
                 watched = True
                 globals.analytics.trackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
-            else
-                globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, "", [])
             end if
         else if msg.isPlaybackPosition() then
             position = msg.getIndex()
