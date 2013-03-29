@@ -6,8 +6,6 @@ function SearchScreen() as Object
 
     ' Member vars
     this = {}
-
-    this._port = createObject("roMessagePort")
     
     ' Member functions
     this.search = SearchScreen_search
@@ -24,6 +22,7 @@ function SearchScreen_search(feed)
 
     this._feed = feed
 
+    this._port = createObject("roMessagePort")
     this._screen = createObject("roSearchScreen")
 
     this._screen.setMessagePort(this._port) 
@@ -37,7 +36,7 @@ function SearchScreen_search(feed)
     searchString = invalid
 
     while true 
-        msg = wait(0, this._screen.GetMessagePort()) 
+        msg = wait(100, this._port) 
 
         if type(msg) = "roSearchScreenEvent"
             if msg.isScreenClosed()
@@ -80,7 +79,7 @@ function _SearchScreen_getSuggestions(searchString)
 end function
 
 ' Get a list of matches for a given search string
-Function _SearchScreen_getMatches(searchString)
+function _SearchScreen_getMatches(searchString)
 
     this = m
 
@@ -99,6 +98,5 @@ Function _SearchScreen_getMatches(searchString)
 
     return matches 
 
-
-End Function
+end function
 

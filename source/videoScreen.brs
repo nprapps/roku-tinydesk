@@ -7,8 +7,6 @@ function VideoScreen()
 
     ' Member vars
     this = {}
-
-    this._port = CreateObject("roMessagePort")
     
     ' Member functions
     this.play = VideoScreen_play
@@ -23,6 +21,7 @@ function VideoScreen_play(contentItem) as Boolean
     this = m
     globals = getGlobalAA()
     
+    this._port = CreateObject("roMessagePort")
     this._screen = CreateObject("roVideoScreen")
     this._screen.setMessagePort(this._port)
 

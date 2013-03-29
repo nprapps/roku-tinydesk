@@ -84,7 +84,7 @@ function _GridScreen_watch(contentItem)
     watched = this._videoScreen.play(contentItem)
     setLastWatched(contentItem)
 
-    if watched and selected_list <> this.WATCHED then
+    if watched then
         markAsWatched(contentItem)
     end if
 
