@@ -65,11 +65,11 @@ function Analytics() as Object
     this.baseUrl = this.baseUrl + "&utmvid=" + xfer.Escape(device.getDeviceUniqueId())
 
     ' Initialize our "cookies"
-    domainHash = "1024141829" ' should be set by Google, but hardcode to something
+    domainHash = "102995024" ' should be set by Google, but hardcode to something
     visitorID = RegRead("AnalyticsID", "analytics", invalid)
 
     if visitorID = invalid then
-        visitorID = this._random(1000000000,9999999999).toStr()
+        visitorID = this._random(1000000000, 9999999999).toStr()
         RegWrite("AnalyticsID", visitorID, "analytics")
     end if
 
