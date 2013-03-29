@@ -45,11 +45,13 @@ def main():
             break
 
         for story in data['list']['story']:
-            print story['title']['$text']
+            title = story['title']['$text'].replace(': Tiny Desk Concert', '')
+            print title
 
             item = {
                 'id': story['id'],
-                'title': story['title']['$text'],
+                'title': title,
+                'titleSeason': 'Tiny Desk Concerts',
                 'description': strip_tags(story['miniTeaser']['$text']),
                 'sdPosterUrl': None,
                 'hdPosterUrl': None,
