@@ -43,6 +43,9 @@ function Analytics() as Object
     this.startup = Analytics_startup
     this.shutdown = Analytics_shutdown
     this.trackEvent = Analytics_trackEvent
+    this._formatEvent = _Analytics_formatEvent
+    this._formatCustomVars = _Analytics_formatCustomVars
+    this._random = _Analytics_random
 
     xfer = createObject("roUrlTransfer")
     device = createObjecT("roDeviceInfo")
@@ -66,7 +69,7 @@ function Analytics() as Object
     visitorID = RegRead("AnalyticsID", "analytics", invalid)
 
     if visitorID = invalid then
-        visitorID = GARandNumber(1000000000,9999999999).ToStr()
+        visitorID = this._random(1000000000,9999999999).toStr()
         RegWrite("AnalyticsID", visitorID, "analytics")
     end if
 
@@ -84,9 +87,9 @@ function Analytics() as Object
     end if
 
     numSessions = RegRead("NumSessions", "analytics", "0").toint() + 1
-    RegWrite("NumSessions", numSessions.ToStr(), "analytics")
+    RegWrite("NumSessions", numSessions.toStr(), "analytics")
 
-    this.baseUrl = this.baseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.ToStr()
+    this.baseUrl = this.baseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.toStr()
     this.baseUrl = this.baseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
     this.baseUrl = this.baseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
 
@@ -106,17 +109,17 @@ function Analytics_trackEvent(category, action, label, value, customVars)
         this.numPlaybackEvents = this.numPlaybackEvents + 1
     end if
 
-    RegWrite("session_duration", this.sessionTimer.TotalSeconds().ToStr(), "analytics")
-    RegWrite("session_playback_events", this.numPlaybackEvents.ToStr(), "analytics")
+    RegWrite("session_duration", this.sessionTimer.TotalSeconds().toStr(), "analytics")
+    RegWrite("session_playback_events", this.numPlaybackEvents.toStr(), "analytics")
 
     this.numEvents = this.numEvents + 1
 
     url = this.baseUrl
-    url = url + "&utms=" + this.numEvents.ToStr()
-    url = url + "&utmn=" + GARandNumber(1000000000,9999999999).ToStr()   'Random Request Number
+    url = url + "&utms=" + this.numEvents.toStr()
+    url = url + "&utmn=" + this._random(1000000000,9999999999).toStr()   'Random Request Number
     url = url + "&utmac=" + this.account
     url = url + "&utmt=event"
-    url = url + "&utme=" + analyticsFormatEvent(category, action, label, value) + analyticsFormatCustomVars(customVars)
+    url = url + "&utme=" + this._formatEvent(category, action, label, value) + this._formatCustomVars(customVars)
 
     print "Analytics URL: " + url
     http_get_ignore_response(url)
@@ -143,11 +146,11 @@ function Analytics_shutdown()
 
     this = m
 
-    RegWrite("session_duration", this.sessionTimer.TotalSeconds().ToStr(), "analytics")
+    RegWrite("session_duration", this.sessionTimer.TotalSeconds().toStr(), "analytics")
 
 end function
 
-Function analyticsFormatEvent(category, action, label, value) As String
+Function _Analytics_formatEvent(category, action, label, value) As String
 
     xfer = CreateObject("roUrlTransfer")
 
@@ -164,7 +167,7 @@ Function analyticsFormatEvent(category, action, label, value) As String
 
 End Function
 
-Function analyticsFormatCustomVars(vars) As String
+Function _Analytics_formatCustomVars(vars) As String
     xfer = CreateObject("roUrlTransfer")
     vars = CreateObject("roArray", 5, false)
 
@@ -180,7 +183,7 @@ Function analyticsFormatCustomVars(vars) As String
             if i = 0 then
                 prefix = "("
             else if skipped then
-                prefix = i.ToStr() + "!"
+                prefix = i.toStr() + "!"
             else
                 prefix = "*"
             end if
@@ -208,7 +211,7 @@ Function analyticsFormatCustomVars(vars) As String
 
 End Function
 
-Function GARandNumber(num_min As Integer, num_max As Integer) As Integer
+Function _Analytics_random(num_min As Integer, num_max As Integer) As Integer
 
     Return (RND(0) * (num_max - num_min)) + num_min
 
