@@ -134,7 +134,7 @@ function Analytics_startup()
 
     if lastSessionDuration > 0 then
         lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0").toInt()
-        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.toStr() }])
+        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [])
     end if
 
     this.trackEvent("Tiny Desk", "Startup", "", "", [])
