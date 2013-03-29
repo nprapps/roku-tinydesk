@@ -4,10 +4,12 @@
 
 function Main()
 
-    initAnalytics()
-    analyticsStartup()
+    globals = getGlobalAA()
+
+    globals.analytics = Analytics()
+    globals.analytics.startup()
     GridScreen()
-    analyticsShutdown()
+    globals.analytics.shutdown()
 
 end function
 

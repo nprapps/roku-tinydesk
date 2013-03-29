@@ -27,32 +27,39 @@ REM   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF 
 REM   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 REM *****************************************************
 
-Function initAnalytics()
+function Analytics() as Object
 
-    obj = CreateObject("roAssociativeArray")
+    this = {}
 
-    m.Account = "UA-39645840-3"
-    m.AppName = "roku-tinydesk"
-    m.Domain = "apps.npr.org"
-    m.NumEvents = 0
-    m.NumPlaybackEvents = 0
+    this.account = "UA-39645840-3"
+    this.appName = "roku-tinydesk"
+    this.domain = "apps.npr.org"
+    this.numEvents = 0
+    this.numPlaybackEvents = 0
+    this.baseUrl = ""
+    
+    this.sessionTimer = CreateObject("roTimespan")
 
-    xfer = CreateObject("roUrlTransfer")
+    this.startup = Analytics_startup
+    this.shutdown = Analytics_shutdown
+    this.trackEvent = Analytics_trackEvent
+
+    xfer = createObject("roUrlTransfer")
     device = createObjecT("roDeviceInfo")
     screenSize = device.getDisplaySize()
 
-    m.BaseUrl = "http://www.google-analytics.com/__utm.gif"
-    m.BaseUrl = m.BaseUrl + "?utmwv=1"
-    m.BaseUrl = m.BaseUrl + "&utmsr=" + screenSize.w.toStr() + "x" + screenSize.h.toStr()
-    m.BaseUrl = m.BaseUrl + "&utmsc=24-bit"
-    m.BaseUrl = m.BaseUrl + "&utmul=en-us"
-    m.BaseUrl = m.BaseUrl + "&utmje=0"
-    m.BaseUrl = m.BaseUrl + "&utmfl=-"
-    m.BaseUrl = m.BaseUrl + "&utmdt=" + xfer.Escape(m.AppName)
-    m.BaseUrl = m.BaseUrl + "&utmp=" + xfer.Escape(m.AppName)
-    m.BaseUrl = m.BaseUrl + "&utmhn=" + xfer.Escape(m.Domain)
-    m.BaseUrl = m.BaseUrl + "&utmr=-"
-    m.BaseUrl = m.BaseUrl + "&utmvid=" + xfer.Escape(device.getDeviceUniqueId())
+    this.baseUrl = "http://www.google-analytics.com/__utm.gif"
+    this.baseUrl = this.baseUrl + "?utmwv=1"
+    this.baseUrl = this.baseUrl + "&utmsr=" + screenSize.w.toStr() + "x" + screenSize.h.toStr()
+    this.baseUrl = this.baseUrl + "&utmsc=24-bit"
+    this.baseUrl = this.baseUrl + "&utmul=en-us"
+    this.baseUrl = this.baseUrl + "&utmje=0"
+    this.baseUrl = this.baseUrl + "&utmfl=-"
+    this.baseUrl = this.baseUrl + "&utmdt=" + xfer.Escape(this.appName)
+    this.baseUrl = this.baseUrl + "&utmp=" + xfer.Escape(this.appName)
+    this.baseUrl = this.baseUrl + "&utmhn=" + xfer.Escape(this.domain)
+    this.baseUrl = this.baseUrl + "&utmr=-"
+    this.baseUrl = this.baseUrl + "&utmvid=" + xfer.Escape(device.getDeviceUniqueId())
 
     ' Initialize our "cookies"
     domainHash = "1024141829" ' should be set by Google, but hardcode to something
@@ -63,10 +70,10 @@ Function initAnalytics()
         RegWrite("AnalyticsID", visitorID, "analytics")
     end if
 
-    timestamp = CreateObject("roDateTime")
+    timestamp = createObject("roDateTime")
     firstTimestamp = RegRead("FirstTimestamp", "analytics", invalid)
     prevTimestamp = RegRead("PrevTimestamp", "analytics", invalid)
-    curTimestamp = timestamp.asSeconds().ToStr()
+    curTimestamp = timestamp.asSeconds().toStr()
 
     RegWrite("PrevTimestamp", curTimestamp, "analytics")
 
@@ -79,62 +86,66 @@ Function initAnalytics()
     numSessions = RegRead("NumSessions", "analytics", "0").toint() + 1
     RegWrite("NumSessions", numSessions.ToStr(), "analytics")
 
-    m.BaseUrl = m.BaseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.ToStr()
-    m.BaseUrl = m.BaseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
-    m.BaseUrl = m.BaseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
+    this.baseUrl = this.baseUrl + "&utmcc=__utma%3D" + domainHash + "." + visitorID + "." + firstTimestamp + "." + prevTimestamp + "." + curTimestamp + "." + numSessions.ToStr()
+    this.baseUrl = this.baseUrl + "%3B%2B__utmb%3D" + domainHash + ".0.10." + curTimestamp + "000"
+    this.baseUrl = this.baseUrl + "%3B%2B__utmc%3D" + domainHash + ".0.10." + curTimestamp + "000"
 
-    m.SessionTimer = CreateObject("roTimespan")
-    m.SessionTimer.mark()
+    this.sessionTimer.mark()
 
-    return obj
+    return this 
 
-End Function
+end function
 
-Sub analyticsTrackEvent(category, action, label, value, customVars)
+function Analytics_trackEvent(category, action, label, value, customVars)
+
+    this = m
 
     ' Now's a good time to update our session variables, in case we don't shut
     ' down cleanly.
     if category = "Start" or category = "Continue" then
-        m.NumPlaybackEvents = m.NumPlaybackEvents + 1
+        this.numPlaybackEvents = this.numPlaybackEvents + 1
     end if
 
-    RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
-    RegWrite("session_playback_events", m.NumPlaybackEvents.ToStr(), "analytics")
+    RegWrite("session_duration", this.sessionTimer.TotalSeconds().ToStr(), "analytics")
+    RegWrite("session_playback_events", this.numPlaybackEvents.ToStr(), "analytics")
 
-    m.NumEvents = m.NumEvents + 1
+    this.numEvents = this.numEvents + 1
 
-    url = m.BaseUrl
-    url = url + "&utms=" + m.NumEvents.ToStr()
+    url = this.baseUrl
+    url = url + "&utms=" + this.numEvents.ToStr()
     url = url + "&utmn=" + GARandNumber(1000000000,9999999999).ToStr()   'Random Request Number
-    url = url + "&utmac=" + m.Account
+    url = url + "&utmac=" + this.account
     url = url + "&utmt=event"
     url = url + "&utme=" + analyticsFormatEvent(category, action, label, value) + analyticsFormatCustomVars(customVars)
 
     print "Analytics URL: " + url
     http_get_ignore_response(url)
 
-End Sub
+end function
 
-Sub analyticsStartup()
+function Analytics_startup()
+
+    this = m 
 
     lastSessionDuration = RegRead("session_duration", "analytics", "0").toInt()
 
     if lastSessionDuration > 0 then
         lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0").toInt()
-        analyticsTrackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.toStr() }])
+        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [invalid, invalid, { name: "NumEvents", value: lastSessionPlaybackEvents.toStr() }])
     end if
 
-    analyticsTrackEvent("Tiny Desk", "Startup", "", "", [])
+    this.trackEvent("Tiny Desk", "Startup", "", "", [])
 
-End Sub
+end function
 
 ' Do final analytics processing
-Sub analyticsShutdown()
+function Analytics_shutdown()
 
-    RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
-    m.SessionTimer = invalid
+    this = m
 
-End Sub
+    RegWrite("session_duration", this.sessionTimer.TotalSeconds().ToStr(), "analytics")
+
+end function
 
 Function analyticsFormatEvent(category, action, label, value) As String
 
