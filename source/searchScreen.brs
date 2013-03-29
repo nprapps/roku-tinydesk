@@ -2,6 +2,7 @@
 ' The video search screen.
 '
 
+' Search screen constructor
 function SearchScreen() as Object
 
     ' Member vars
@@ -16,6 +17,7 @@ function SearchScreen() as Object
 
 end function
 
+' Execute a search
 function SearchScreen_search(feed)
 
     this = m
