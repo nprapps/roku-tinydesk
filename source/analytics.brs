@@ -38,10 +38,12 @@ Function initAnalytics()
     m.NumPlaybackEvents = 0
 
     xfer = CreateObject("roUrlTransfer")
+    device = createObjecT("roDeviceInfo")
+    screenSize = device.getDisplaySize()
 
     m.BaseUrl = "http://www.google-analytics.com/__utm.gif"
     m.BaseUrl = m.BaseUrl + "?utmwv=1"
-    'm.BaseUrl = m.BaseUrl + "&utmsr=" + xfer.Escape(GetGlobal("DisplayMode") + " " + GetGlobal("DisplayType"))
+    m.BaseUrl = m.BaseUrl + "&utmsr=" + screenSize.w.toStr() + "x" + screenSize.h.toStr()
     m.BaseUrl = m.BaseUrl + "&utmsc=24-bit"
     m.BaseUrl = m.BaseUrl + "&utmul=en-us"
     m.BaseUrl = m.BaseUrl + "&utmje=0"
@@ -50,7 +52,7 @@ Function initAnalytics()
     m.BaseUrl = m.BaseUrl + "&utmp=" + xfer.Escape(m.AppName)
     m.BaseUrl = m.BaseUrl + "&utmhn=" + xfer.Escape(m.Domain)
     m.BaseUrl = m.BaseUrl + "&utmr=-"
-    'm.BaseUrl = m.BaseUrl + "&utmvid=" + xfer.Escape(GetGlobal("rokuUniqueID"))
+    m.BaseUrl = m.BaseUrl + "&utmvid=" + xfer.Escape(device.getDeviceUniqueId())
 
     ' Initialize our "cookies"
     domainHash = "1024141829" ' should be set by Google, but hardcode to something
