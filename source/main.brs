@@ -5,9 +5,9 @@
 function Main()
 
     initAnalytics()
-    analyticsOnStartup()
+    analyticsStartup()
     GridScreen()
-    analyticsCleanup()
+    analyticsShutdown()
 
 end function
 

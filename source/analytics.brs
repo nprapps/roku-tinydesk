@@ -94,7 +94,10 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
 
     ' Now's a good time to update our session variables, in case we don't shut
     ' down cleanly.
-    if category = "Playback" then m.NumPlaybackEvents = m.NumPlaybackEvents + 1
+    if category = "Start" or category = "Continue" then
+        m.NumPlaybackEvents = m.NumPlaybackEvents + 1
+    end if
+
     RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
     RegWrite("session_playback_events", m.NumPlaybackEvents.ToStr(), "analytics")
 
@@ -112,7 +115,7 @@ Sub analyticsTrackEvent(category, action, label, value, customVars)
 
 End Sub
 
-Sub analyticsOnStartup()
+Sub analyticsStartup()
 
     lastSessionDuration = RegRead("session_duration", "analytics", "0").toInt()
 
@@ -125,11 +128,9 @@ Sub analyticsOnStartup()
 
 End Sub
 
-Sub analyticsCleanup()
+' Do final analytics processing
+Sub analyticsShutdown()
 
-    ' Just note the session duration. We wrote the number of playback events the
-    ' last time we got one, and we won't send the actual event until the next
-    ' startup.
     RegWrite("session_duration", m.SessionTimer.TotalSeconds().ToStr(), "analytics")
     m.SessionTimer = invalid
 
