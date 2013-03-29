@@ -127,7 +127,7 @@ function _GridScreen_initLists()
     this._lists[this.SEARCH] = []
 
     this._refreshLists()
-    this._screen.setFocusedListItem(this.RECENT, 0)
+    this._screen.setFocusedListItem(this.ALL, 0)
 
     this._screen.Show()
 
