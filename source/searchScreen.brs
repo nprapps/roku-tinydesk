@@ -10,8 +10,8 @@ function SearchScreen() as Object
     
     ' Member functions
     this.search = SearchScreen_search
+    this.getMatches = SearchScreen_getMatches
     this._getSuggestions = _SearchScreen_getSuggestions
-    this._getMatches = _SearchScreen_getMatches
 
     return this
 
@@ -24,6 +24,7 @@ function SearchScreen_search(feed)
     globals = getGlobalAA()
 
     this._feed = feed
+    this._searchString = invalid
 
     this._port = createObject("roMessagePort")
     this._screen = createObject("roSearchScreen")
@@ -36,10 +37,8 @@ function SearchScreen_search(feed)
     
     this._screen.Show() 
 
-    searchString = invalid
-
     while true 
-        msg = wait(100, this._port) 
+        msg = wait(0, this._port) 
 
         if type(msg) = "roSearchScreenEvent"
             if msg.isScreenClosed()
@@ -47,30 +46,28 @@ function SearchScreen_search(feed)
             else if msg.isCleared()
                 history.Clear()
             else if msg.isPartialResult()
-                searchString = msg.GetMessage()
-                this._screen.SetSearchTerms(this._getSuggestions(searchString))
+                this._searchString = msg.GetMessage()
+                this._screen.SetSearchTerms(this._getSuggestions())
             else if msg.isFullResult()
-                searchString = msg.GetMessage()
+                this._searchString = msg.GetMessage()
 
-                globals.analytics.trackEvent("Tiny Desk", "Search", searchString, "", [])
+                globals.analytics.trackEvent("Tiny Desk", "Search", this._searchString, "", [])
 
                 exit while
             endif
         endif
     endwhile 
 
-    this._screen.Close()
-
-    return this._getMatches(searchString)
+    this._screen.close()
 
 end function
 
 ' Get a list of suggestions for a given search string
-function _SearchScreen_getSuggestions(searchString)
+function _SearchScreen_getSuggestions()
 
     this = m
 
-    lSearchString = lCase(searchString)
+    lSearchString = lCase(this._searchString)
     suggestions = []
 
     for each contentItem in this._feed
@@ -86,15 +83,15 @@ function _SearchScreen_getSuggestions(searchString)
 end function
 
 ' Get a list of matches for a given search string
-function _SearchScreen_getMatches(searchString)
+function SearchScreen_getMatches()
 
     this = m
 
-    if searchString = invalid or searchString = "" then
+    if this._searchString = invalid or this._searchString = "" then
         return []
     end if
 
-    lSearchString = lCase(searchString)
+    lSearchString = lCase(this._searchString)
 
     print lSearchString
 

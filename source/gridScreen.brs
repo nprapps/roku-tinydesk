@@ -57,7 +57,6 @@ function GridScreen() as Object
 
     this._screen.ClearMessage()
 
-
     return this
 
 end function
@@ -129,7 +128,12 @@ function _GridScreen_search()
 
     this = m
 
-    this._lists[this.SEARCH] = this._searchScreen.search(this._feed)
+    this._searchScreen.search(this._feed)
+
+    this._screen.showMessage("Searching...")
+
+    this._lists[this.SEARCH] = this._searchScreen.getMatches()
+    
     this._lists[this.SEARCH].unshift(this.SEARCH_ITEM)
 
     ' No results
@@ -145,6 +149,8 @@ function _GridScreen_search()
         this._refreshLists()
         this._screen.setFocusedListItem(this.SEARCH, 1)
     end if
+
+    this._screen.clearMessage()
 
 end function
 
@@ -177,7 +183,7 @@ function _GridScreen_initLists()
     this._refreshLists()
     this._screen.setFocusedListItem(this.ALL, 0)
 
-    this._screen.Show()
+    this._screen.show()
 
 end function
 
@@ -207,7 +213,7 @@ function _GridScreen_refreshLists()
         this._screen.setFocusedListItem(i, 0)
     end for
 
-    this._screen.Show()
+    this._screen.show()
 
 end function
 
