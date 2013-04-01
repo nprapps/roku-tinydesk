@@ -8,6 +8,7 @@ import shlex
 import string
 import subprocess
 import unicodedata
+from urllib import quote 
 
 from dateutil.parser import parse
 import requests
@@ -39,7 +40,9 @@ def main():
 
     while True: 
         print 'Fetching page %i' % page
-        response = requests.get('http://api.npr.org/query?id=92071316&apiKey=%s&output=json&startNum=%i&numResults=50' % (os.environ['NPR_API_KEY'], page * 50))
+        url = 'http://api.npr.org/query?id=92071316&apiKey=%s&output=json&startNum=%i&numResults=50' % (os.environ['NPR_API_KEY'], page * 50)
+        print url
+        response = requests.get(url)
 
         data = response.json() 
 
@@ -71,8 +74,8 @@ def main():
 
             alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
 
-            item['sdPosterUrl'] = alt_image_url + '?s=2'
-            item['hdPosterUrl'] = alt_image_url + '?s=3'
+            item['sdPosterUrl'] = alt_image_url.replace(' ', '%20') + '?s=2'
+            item['hdPosterUrl'] = alt_image_url.replace(' ', '%20') + '?s=3'
 
 
             # Formatted as: "Mon, 11 Mar 2013 14:03:00 -0400"
