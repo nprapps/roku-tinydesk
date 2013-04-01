@@ -8,6 +8,7 @@ function Main()
 
     globals.analytics = Analytics()
     globals.analytics.startup()
+    SetTheme()
     GridScreen()
     globals.analytics.shutdown()
 
