@@ -117,9 +117,15 @@ function _GridScreen_search()
     this._lists[this.SEARCH] = this._searchScreen.search(this._feed)
     this._lists[this.SEARCH].unshift(this.SEARCH_ITEM)
 
+    ' No results
     if this._lists[this.SEARCH].count() = 1 then
-        contentItem = this._lists[this.SEARCH][0]
+        this._refreshLists()
+        this._screen.setFocusedListItem(this.SEARCH, 0)
+    ' One result
+    else if this._lists[this.SEARCH].count() = 2 then
+        contentItem = this._lists[this.SEARCH][1]
         this._watch(contentItem)
+    ' Multiple results
     else
         this._refreshLists()
         this._screen.setFocusedListItem(this.SEARCH, 1)

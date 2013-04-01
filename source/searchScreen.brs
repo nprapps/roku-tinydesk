@@ -61,6 +61,8 @@ function SearchScreen_search(feed)
 
     this._screen.Close()
 
+    print searchString
+
     return this._getMatches(searchString)
 
 end function
@@ -102,6 +104,8 @@ function _SearchScreen_getMatches(searchString)
             matches.Push(feedItem)
         end if
     end for
+
+    print matches
 
     return sortBy(matches, "title")
 
