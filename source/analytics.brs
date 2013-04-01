@@ -35,7 +35,8 @@ function Analytics() as Object
     this.appName = "roku-tinydesk"
     this.domain = "apps.npr.org"
     this.numEvents = 0
-    this.numPlaybackEvents = 0
+    this.numWatched = 0
+    this.numFinished = 0
     this.baseUrl = ""
     
     this.sessionTimer = createObject("roTimespan")
@@ -106,14 +107,17 @@ function Analytics_trackEvent(category, action, label, value, customVars)
 
     this = m
 
-    ' Now's a good time to update our session variables, in case we don't shut
-    ' down cleanly.
-    if category = "Start" or category = "Continue" then
-        this.numPlaybackEvents = this.numPlaybackEvents + 1
+    if action = "Start" or action = "Continue" then
+        this.numWatched = this.numWatched + 1
     end if
 
-    RegWrite("session_duration", this.sessionTimer.TotalSeconds().toStr(), "analytics")
-    RegWrite("session_playback_events", this.numPlaybackEvents.toStr(), "analytics")
+    if action = "Finish" then
+        this.numFinished = this.numFinished + 1
+    end if
+
+    RegWrite("sessionDuration", this.sessionTimer.TotalSeconds().toStr(), "analytics")
+    RegWrite("sessionNumWatched", this.numWatched.toStr(), "analytics")
+    RegWrite("sessionNumFinished", this.numFinished.toStr(), "analytics")
 
     this.numEvents = this.numEvents + 1
 
@@ -134,11 +138,12 @@ function Analytics_startup()
 
     this = m 
 
-    lastSessionDuration = RegRead("session_duration", "analytics", "0").toInt()
+    lastSessionDuration = RegRead("sessionDuration", "analytics", "0").toInt()
 
     if lastSessionDuration > 0 then
-        lastSessionPlaybackEvents = RegRead("session_playback_events", "analytics", "0").toInt()
-        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [])
+        lastSessionWatched = RegRead("sessionNumWatched", "analytics", "0").toInt()
+        lastSessionFinished = RegRead("sessionNumFinished", "analytics", "0").toInt()
+        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [{ name: "numWatched", value: lastSessionWatched }, { name: "numFinished", value: lastSessionFinished }])
     end if
 
     this.trackEvent("Tiny Desk", "Startup", "", "", [])
@@ -179,16 +184,17 @@ End Function
 Function _Analytics_formatCustomVars(vars) As String
 
     xfer = createObject("roUrlTransfer")
-    vars = createObject("roArray", 5, false)
 
-    if vars.count() = 0 then return ""
+    if vars.count() = 0 then
+        return ""
+    end if
 
     names = "8"
     values = "9"
     scopes = "11"
     skipped = false
 
-    for i = 0 to vars.Count() - 1
+    for i = 0 to vars.count() - 1
         if vars[i] <> invalid then
             if i = 0 then
                 prefix = "("
@@ -198,10 +204,10 @@ Function _Analytics_formatCustomVars(vars) As String
                 prefix = "*"
             end if
 
-            names = names + prefix + xfer.Escape(firstOf(vars[i].name, ""))
-            values = values + prefix + xfer.Escape(firstOf(vars[i].value, ""))
+            names = names + prefix + xfer.Escape(vars[i].name)
+            values = values + prefix + xfer.Escape(vars[i].value.toStr())
 
-            if pageVars[i] <> invalid then
+            if vars[i] <> invalid then
                 scope = "3"
             else
                 scope = "2"

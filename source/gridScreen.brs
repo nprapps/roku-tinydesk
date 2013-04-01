@@ -34,6 +34,7 @@ function GridScreen() as Object
     this._visibleLists = []
     
     ' Member functions
+    this.run = GridScreen_run
     this._watch = _GridScreen_watch
     this._search = _GridScreen_search
     this._initLists = _GridScreen_initLists
@@ -56,8 +57,22 @@ function GridScreen() as Object
 
     this._screen.ClearMessage()
 
+
+    return this
+
+end function
+
+' Run the GridScreen main loop, which functions as the app main loop
+function GridScreen_run()
+
+    this = m
+
     while true
         msg = wait(0, this._port)
+
+        if msg = invalid then
+            exit while
+        end if
 
         if msg.isListItemSelected() then
             selected_list = msg.getIndex()
@@ -77,8 +92,6 @@ function GridScreen() as Object
             exit while
         end if
     end while
-
-    return this
 
 end function
 
