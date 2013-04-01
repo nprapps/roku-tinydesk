@@ -12,6 +12,8 @@ function GridScreen() as Object
     this.RECENT = 1
     this.SEARCH = 2
 
+    this.MAX_AGE_FOR_RECENT_LIST = 60 * 60 * 24 * 14
+
     this.SEARCH_ITEM = {
         id: "search",
         title: "Search",
@@ -142,11 +144,16 @@ function _GridScreen_initLists()
         this._lists[i] = []
     end for
 
+    now = createObject("roDateTime").asSeconds()
+    threshold = now - this.MAX_AGE_FOR_RECENT_LIST 
+
     for each contentItem in this._feed 
         contentItem["lastWatched"] = getLastWatched(contentItem)
 
         if contentItem["lastWatched"] <> invalid then
-            this._lists[this.RECENT].Push(contentItem)
+            if contentItem["lastWatched"] > threshold then
+                this._lists[this.RECENT].Push(contentItem)
+            end if
         end if
     end for
     
