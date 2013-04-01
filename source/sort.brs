@@ -10,7 +10,7 @@ function sort(list, ascending=True)
         j = i - 1
 
         while j >= 0
-            if (ascending and list[j] > value) or (not ascending and list[j] < value) then 
+            if (ascending and list[j] < value) or (not ascending and list[j] > value) then 
                 exit while
             end if
 
