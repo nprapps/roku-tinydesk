@@ -40,7 +40,7 @@ def main():
 
     while True: 
         print 'Fetching page %i' % page
-        url = 'http://api.npr.org/query?id=92071316&apiKey=%s&output=json&startNum=%i&numResults=50' % (os.environ['NPR_API_KEY'], page * 50)
+        url = 'http://api.npr.org/query?id=92071316&apiKey=%s&output=json&startNum=%i&numResults=40' % (os.environ['NPR_API_KEY'], page * 40)
         print url
         response = requests.get(url)
 
