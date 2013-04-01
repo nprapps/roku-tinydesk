@@ -30,15 +30,12 @@ function GridScreen() as Object
     this._feed = []
     this._titles = ["All", "Recently watched", "Search"]
     this._lists = []
-    this._visibleTitles = [] 
-    this._visibleLists = []
     
     ' Member functions
     this.run = GridScreen_run
     this._watch = _GridScreen_watch
     this._search = _GridScreen_search
     this._initLists = _GridScreen_initLists
-    this._refreshLists = _GridScreen_refreshLists
 
     ' Setup
     this._screen.setMessagePort(this._port)
@@ -76,7 +73,7 @@ function GridScreen_run()
         if msg.isListItemSelected() then
             selected_list = msg.getIndex()
             selected_item = msg.getData()
-            contentItem = this._visibleLists[selected_list][selected_item]
+            contentItem = this._lists[selected_list][selected_item]
 
             if contentItem.id = "search" then
                 this._search()
@@ -117,7 +114,9 @@ function _GridScreen_watch(contentItem)
     ' Add vid to recent list
     this._lists[this.RECENT].unshift(contentItem)
 
-    this._refreshLists()
+    this._screen.setContentList(this.RECENT, this._lists[this.RECENT])
+
+    this._videoScreen.close()
 
     this._screen.setFocusedListItem(this.RECENT, 0)
 
@@ -130,15 +129,16 @@ function _GridScreen_search()
 
     this._searchScreen.search(this._feed)
 
-    this._screen.showMessage("Searching...")
-
     this._lists[this.SEARCH] = this._searchScreen.getMatches()
-    
     this._lists[this.SEARCH].unshift(this.SEARCH_ITEM)
+
+    this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._searchScreen.getQuery() + chr(34)) 
+    this._screen.setContentList(this.SEARCH, this._lists[this.SEARCH])
+
+    this._searchScreen.close()
 
     ' No results
     if this._lists[this.SEARCH].count() = 1 then
-        this._refreshLists()
         this._screen.setFocusedListItem(this.SEARCH, 0)
     ' One result
     else if this._lists[this.SEARCH].count() = 2 then
@@ -146,11 +146,8 @@ function _GridScreen_search()
         this._watch(contentItem)
     ' Multiple results
     else
-        this._refreshLists()
         this._screen.setFocusedListItem(this.SEARCH, 1)
     end if
-
-    this._screen.clearMessage()
 
 end function
 
@@ -180,38 +177,15 @@ function _GridScreen_initLists()
     sortBy(this._lists[this.RECENT], "lastWatched", False)
     this._lists[this.SEARCH] = [this.SEARCH_ITEM]
 
-    this._refreshLists()
-    this._screen.setFocusedListItem(this.ALL, 0)
+    this._screen.setupLists(this._titles.count())
+    this._screen.setListNames(this._titles)
 
-    this._screen.show()
-
-end function
-
-' Render the grid lists, but only those with data
-function _GridScreen_refreshLists()
-
-    this = m
-
-    this._visibleTitles = [this._titles[this.ALL]]
-    this._visibleLists = [this._lists[this.ALL]]
-
-    if this._lists[this.RECENT].Count() > 0 then
-        this._visibleTitles.Push(this._titles[this.RECENT])
-        this._visibleLists.Push(this._lists[this.RECENT])
-    end if
-
-    if this._lists[this.SEARCH].Count() > 0 then
-        this._visibleTitles.Push(this._titles[this.SEARCH])
-        this._visibleLists.Push(this._lists[this.SEARCH])
-    end if
-
-    this._screen.setupLists(this._visibleTitles.Count())
-    this._screen.setListNames(this._visibleTitles)
-
-    for i = 0 to this._visibleLists.Count() - 1
-        this._screen.setContentList(i, this._visibleLists[i])
+    for i = 0 to this._lists.count() - 1
+        this._screen.setContentList(i, this._lists[i])
         this._screen.setFocusedListItem(i, 0)
     end for
+
+    this._screen.setFocusedListItem(this.ALL, 0)
 
     this._screen.show()
 

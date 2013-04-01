@@ -11,6 +11,8 @@ function SearchScreen() as Object
     ' Member functions
     this.search = SearchScreen_search
     this.getMatches = SearchScreen_getMatches
+    this.getQuery = SearchScreen_getQuery
+    this.close = SearchScreen_close
     this._getSuggestions = _SearchScreen_getSuggestions
 
     return this
@@ -24,7 +26,7 @@ function SearchScreen_search(feed)
     globals = getGlobalAA()
 
     this._feed = feed
-    this._searchString = invalid
+    this._query = invalid
 
     this._port = createObject("roMessagePort")
     this._screen = createObject("roSearchScreen")
@@ -46,19 +48,19 @@ function SearchScreen_search(feed)
             else if msg.isCleared()
                 history.Clear()
             else if msg.isPartialResult()
-                this._searchString = msg.GetMessage()
+                this._query = msg.GetMessage()
                 this._screen.SetSearchTerms(this._getSuggestions())
             else if msg.isFullResult()
-                this._searchString = msg.GetMessage()
+                this._query = msg.GetMessage()
 
-                globals.analytics.trackEvent("Tiny Desk", "Search", this._searchString, "", [])
+                globals.analytics.trackEvent("Tiny Desk", "Search", this._query, "", [])
 
                 exit while
             endif
         endif
     endwhile 
 
-    this._screen.close()
+    'this._screen.close()
 
 end function
 
@@ -67,11 +69,11 @@ function _SearchScreen_getSuggestions()
 
     this = m
 
-    lSearchString = lCase(this._searchString)
+    lQuery = lCase(this._query)
     suggestions = []
 
     for each contentItem in this._feed
-        if instr(lCase(contentItem.searchTitle), lSearchString) > 0 then
+        if instr(lCase(contentItem.searchTitle), lQuery) > 0 then
             suggestions.Push(contentItem.searchTitle)
         end if
     end for
@@ -87,18 +89,16 @@ function SearchScreen_getMatches()
 
     this = m
 
-    if this._searchString = invalid or this._searchString = "" then
+    if this._query = invalid or this._query = "" then
         return []
     end if
 
-    lSearchString = lCase(this._searchString)
-
-    print lSearchString
+    lQuery = lCase(this._query)
 
     matches = []
 
     for each contentItem in this._feed
-        if instr(lCase(contentItem.searchTitle), lSearchString) > 0 then
+        if instr(lCase(contentItem.searchTitle), lQuery) > 0 then
             matches.Push(contentItem)
         end if
     end for
@@ -109,3 +109,20 @@ function SearchScreen_getMatches()
 
 end function
 
+' Get the query last searched
+function SearchScreen_getQuery()
+
+    this = m
+
+    return this._query
+
+end function
+
+' Close the screen
+function SearchScreen_close()
+
+    this = m
+
+    this._screen.close()
+
+end function

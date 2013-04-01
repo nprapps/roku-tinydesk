@@ -10,6 +10,7 @@ function VideoScreen()
     
     ' Member functions
     this.play = VideoScreen_play
+    this.close = VideoScreen_close
 
     return this
 
@@ -79,10 +80,14 @@ function VideoScreen_play(contentItem) as Boolean
         end if
     end while
 
-    this._screen.close()
-
     return watched
 
-End Function
+end function
 
+function VideoScreen_close()
 
+    this = m
+
+    this._screen.close()
+
+end function
