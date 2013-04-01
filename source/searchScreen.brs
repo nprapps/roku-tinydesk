@@ -79,7 +79,9 @@ function _SearchScreen_getSuggestions(searchString)
         end if
     end for
 
-    return sort(suggestions)
+    sort(suggestions)
+
+    return suggestions
 
 end function
 

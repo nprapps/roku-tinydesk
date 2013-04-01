@@ -21,8 +21,6 @@ function sort(list, ascending=True)
         list[j + 1] = value
     next
 
-    return list
-
 end function
 
 ' Sort a list of objects by some common property (bubble sort)
