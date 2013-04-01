@@ -5,7 +5,9 @@ import gzip
 import json
 import os
 import shlex
+import string
 import subprocess
+import unicodedata
 
 from dateutil.parser import parse
 import requests
@@ -42,6 +44,7 @@ def main():
         data = response.json() 
 
         if 'message' in data and data['message'][0]['id'] == '401':
+            print data['message']
             break
 
         for story in data['list']['story']:
@@ -51,6 +54,7 @@ def main():
             item = {
                 'id': story['id'],
                 'title': title,
+                'searchTitle': searchify_title(title), 
                 'titleSeason': 'Tiny Desk Concerts',
                 'description': strip_tags(story['miniTeaser']['$text']),
                 'sdPosterUrl': None,
@@ -110,6 +114,9 @@ def main():
     print 'Deploying to S3'
 
     subprocess.Popen(shlex.split(UPLOAD_CMD), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def searchify_title(title):
+    return ''.join(x for x in unicodedata.normalize('NFKD', title) if x in string.printable)
 
 if __name__ == '__main__':
     main()

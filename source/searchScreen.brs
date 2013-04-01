@@ -70,12 +70,12 @@ function _SearchScreen_getSuggestions(searchString)
 
     this = m
 
-    lSearchString = LCase(searchString)
+    lSearchString = lCase(searchString)
     suggestions = []
 
-    for each feedItem in this._feed
-        if instr(LCase(feedItem.title), lSearchString) > 0 then
-            suggestions.Push(feedItem.title)
+    for each contentItem in this._feed
+        if instr(lCase(contentItem.searchTitle), lSearchString) > 0 then
+            suggestions.Push(contentItem.searchTitle)
         end if
     end for
 
@@ -94,16 +94,19 @@ function _SearchScreen_getMatches(searchString)
         return []
     end if
 
-    lSearchString = LCase(searchString)
+    lSearchString = lCase(searchString)
+
+    print lSearchString
+
     matches = []
 
-    for each feedItem in this._feed
-        if instr(LCase(feedItem.title), lSearchString) > 0 then
-            matches.Push(feedItem)
+    for each contentItem in this._feed
+        if instr(lCase(contentItem.searchTitle), lSearchString) > 0 then
+            matches.Push(contentItem)
         end if
     end for
 
-    sortBy(matches, "title")
+    sortBy(matches, "searchTitle")
 
     return matches
 
