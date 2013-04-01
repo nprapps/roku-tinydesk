@@ -45,8 +45,6 @@ function sortBy(list, property, ascending=True)
         end for
     end while
 
-    return list
-
 end function
 
 ' Why the heck doesn't this work?

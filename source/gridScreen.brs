@@ -151,7 +151,7 @@ function _GridScreen_initLists()
     end for
     
     this._lists[this.ALL] = this._feed
-    this._lists[this.RECENT] = sortBy(this._lists[this.RECENT], "lastWatched")
+    sortBy(this._lists[this.RECENT], "lastWatched", False)
     this._lists[this.SEARCH] = [this.SEARCH_ITEM]
 
     this._refreshLists()
