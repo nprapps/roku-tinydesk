@@ -74,13 +74,13 @@ function _SearchScreen_getSuggestions()
 
     for each contentItem in this._feed
         if instr(lCase(contentItem.searchTitle), lQuery) > 0 then
-            suggestions.Push(contentItem.searchTitle)
+            suggestions.Push(contentItem)
         end if
     end for
 
-    sort(suggestions)
+    sortBy(suggestions, "sortTitle")
 
-    return suggestions
+    return pluck(suggestions, "searchTitle")
 
 end function
 
@@ -103,7 +103,7 @@ function SearchScreen_getMatches()
         end if
     end for
 
-    sortBy(matches, "searchTitle")
+    sortBy(matches, "sortTitle")
 
     return matches
 

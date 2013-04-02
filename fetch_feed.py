@@ -8,7 +8,6 @@ import shlex
 import string
 import subprocess
 import unicodedata
-from urllib import quote 
 
 from dateutil.parser import parse
 import requests
@@ -58,6 +57,7 @@ def main():
                 'id': story['id'],
                 'title': title,
                 'searchTitle': searchify_title(title), 
+                'sortTitle': sortify_title(title), 
                 'titleSeason': 'Tiny Desk Concerts',
                 'description': strip_tags(story['miniTeaser']['$text']),
                 'sdPosterUrl': None,
@@ -74,9 +74,9 @@ def main():
 
             alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
 
+            # Yes, I know this is a hack, but we don't want to urlencode the protocol or domain
             item['sdPosterUrl'] = alt_image_url.replace(' ', '%20') + '?s=2'
             item['hdPosterUrl'] = alt_image_url.replace(' ', '%20') + '?s=3'
-
 
             # Formatted as: "Mon, 11 Mar 2013 14:03:00 -0400"
             pub_date = story['pubDate']['$text']
@@ -120,6 +120,11 @@ def main():
 
 def searchify_title(title):
     return ''.join(x for x in unicodedata.normalize('NFKD', title) if x in string.printable)
+
+def sortify_title(title):
+    title = searchify_title(title)
+
+    return ''.join(x for x in title if x in string.letters + string.digits + ' ').lower()
 
 if __name__ == '__main__':
     main()
