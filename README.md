@@ -60,7 +60,7 @@ Google Analytics
 The following events are tracked in Google Analytics:
 
 |Category|Action|Label|Value|Custom 1|Custom 2|
-|--------|------|-----|-----|
+|--------|------|-----|-----|--------|--------|
 |Tiny Desk|Startup|||||
 |Tiny Desk|Shutdown||`sessionDuration`|`numWatched`|`numFinished`|
 |Tiny Desk|Start|`title`||||
