@@ -59,19 +59,21 @@ Google Analytics
 
 The following events are tracked in Google Analytics:
 
-|Category|Action|Label|Value|
+|Category|Action|Label|Value|Custom 1|Custom 2|
 |--------|------|-----|-----|
-|Tiny Desk|Startup|||
-|Tiny Desk|Shutdown||`session_duration`| 
-|Tiny Desk|Start|`title`||
-|Tiny Desk|Continue|`title`||
-|Tiny Desk|Finish|`title`||
-|Tiny Desk|Stop|`title`|`playtime`|
-|Tiny Desk|Search|`term`||
+|Tiny Desk|Startup|||||
+|Tiny Desk|Shutdown||`sessionDuration`|`numWatched`|`numFinished`|
+|Tiny Desk|Start|`title`||||
+|Tiny Desk|Continue|`title`||||
+|Tiny Desk|Finish|`title`||||
+|Tiny Desk|Stop|`title`|`playtime`|||
+|Tiny Desk|Search|`term`||||
 
-**Note:** The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. `session_duration` will always be approximate. 
+**Notes**:
 
-**Note:** The *Stop* action is reported alongside the *Finish* action when a video is completed, for purposes of tracking playtimes.
+* The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. `sessionDuration` will always be approximate. 
+* The *Stop* action is reported alongside the *Finish* action when a video is completed, for purposes of tracking playtimes.
+* There is no concept of a *ping* in this event model, so users will appear inactive on the Google Analytics dashboard while in the middle of a long video or sitting on a menu. (Their `sessionDuration` recorded in the *Shutdown* event will correctly include the this time.)
 
 Code conventions
 ----------------
