@@ -124,7 +124,12 @@ def searchify_title(title):
 def sortify_title(title):
     title = searchify_title(title)
 
-    return ''.join(x for x in title if x in string.letters + string.digits + ' ').lower()
+    title = ''.join(x for x in title if x in string.letters + string.digits + ' ').lower()
+
+    if title[0:4] == 'the ':
+        title = title[4:]
+
+    return title
 
 if __name__ == '__main__':
     main()
