@@ -22,6 +22,8 @@ $ pip install requirements.txt
 Generate JSON feed
 ------------------
 
+**This step is not necessary to run the app.**
+
 To regenerate the API feed you will need a superuser NPR API key and our AWS keys. Set the API key in your `.bash_profile` like so:
 
 ```
