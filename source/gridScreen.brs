@@ -132,7 +132,12 @@ function _GridScreen_search()
     this._lists[this.SEARCH] = this._searchScreen.getMatches()
     this._lists[this.SEARCH].unshift(this.SEARCH_ITEM)
 
-    this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._searchScreen.getQuery() + chr(34)) 
+    if this._lists[this.SEARCH].count() = 1 then
+        this._screen.setListName(this.SEARCH, "Search")
+    else
+        this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._searchScreen.getQuery() + chr(34)) 
+    end if
+    
     this._screen.setContentList(this.SEARCH, this._lists[this.SEARCH])
 
     this._searchScreen.close()
