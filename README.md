@@ -73,30 +73,38 @@ The following events are tracked in Google Analytics:
 
 * The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. `sessionDuration` will always be approximate. 
 * The *Stop* action is reported alongside the *Finish* action when a video is completed, for purposes of tracking playtimes.
-* There is no concept of a *ping* in this event model, so users will appear inactive on the Google Analytics dashboard while in the middle of a long video or sitting on a menu. (Their `sessionDuration` recorded in the *Shutdown* event will correctly include the this time.)
+* There is no concept of a *ping* in this event model, so users will appear inactive on the Google Analytics dashboard while in the middle of a long video or sitting on a menu. Their `sessionDuration` recorded in the *Shutdown* event will correctly include the this time.
 
 Code conventions
 ----------------
 
-Because Roku dev lacks strong (or any) code conventions, I'm defining my own:
+Because Roku dev lacks strong (or any) code conventions, I'm defining my own.
 
+**Syntax**
+
+* Constants: `UPPERCASE`
+* Variables, public members and public functions: `camelCase`
 * Objects/Constructors: `TitleCase`
-* Members or public functions: `camelCase`
 * Public member functions: `GridScreen.refreshLists = GridScreen_refreshLists`
 * Private member functions `GridScreen._initLists = _GridScreen_initLists`
 * Private member vars: `_underscorePrefixed`
-* Constants: `UPPERCASE`
 * Keywords: lowercase, e.g. `function` and `end function`
 
-All rules for function names also apply when calling case-insensitive built-in functions, e.g. `mid()` not `Mid()` and `count()` not `Count()`
+All rules for function names also apply when calling case-insensitive built-in functions, e.g. `createObject()` and `count()`.
+
+**Code organization**
 
 Leave a line of whitespace after `function` and before `end function`
 
-Comments describing a functions purpose should *precede* the function defintion.
-
-In class constructors define the class object as `this`. In member functions redefine the class object as `this = m`. **Never** use `m` to refer to the global namespace.
-
 Never use `sub`. Always use `function`.
+
+**Classes**
+
+In class constructors define the class object as `this`. In member functions redefine the class object as `this = m`. *Never* use `m` to refer to the global namespace.
+
+**Comments**
+
+Comments describing a functions purpose should *precede* the function defintion.
 
 Modules should begin with a block comment explaning their purpose:
 
