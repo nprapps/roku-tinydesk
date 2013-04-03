@@ -57,6 +57,12 @@ Enjoy!
 Distribute the app
 ------------------
 
+**Note:** If this process isn't completed with Chris' Roku keys, users of the app will lose their registry data. The way around this is to "rekey" each developer's Roku with the same RSA key. Read more here:
+
+http://sdkdocs.roku.com/display/RokuSDKv48/Channel+Packaging+And+Publishing#ChannelPackagingAndPublishing-30PackagingApplications
+
+**Note part 2:** This is probably irrelevant anyway, because you would need Chris' Roku credentials to access the upload page. Ergo, these docs are really just for him.
+
 Distributing the app to Roku requires jumping through additional hoops. First, you'll need to generate crypotgraphic keys on your Roku. Do this like so:
 
 ```
@@ -80,7 +86,7 @@ $ ./ship.sh 1.0
 
 You must supply a version number as the first argument.
 
-Now take your new package and upload it at: [https://owner.roku.com/Developer/Apps/Packages/23962](https://owner.roku.com/Developer/Apps/Packages/23962)
+Now take your new package and upload it at: https://owner.roku.com/Developer/Apps/Packages/23962
 
 Debugging
 ---------
