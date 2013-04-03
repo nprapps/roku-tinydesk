@@ -54,6 +54,34 @@ $ ./build.sh
 
 Enjoy!
 
+Distribute the app
+------------------
+
+Distributing the app to Roku requires jumping through additional hoops. First, you'll need to generate crypotgraphic keys on your Roku. Do this like so:
+
+```
+$ telnet $ROKU_IP
+> genkey
+```
+
+Your password will be print out: **save it**. Exit the telnet session by typing `quit`.
+
+Add this new password to your `~/.bash_profile`:
+
+```
+export ROKU_PASSWORD="YOUR_PASSWORD_HERE"
+```
+
+Now to generate a shippable zip, simply run:
+
+```
+$ ./ship.sh 1.0
+```
+
+You must supply a version number as the first argument.
+
+Now take your new package and upload it at: [https://owner.roku.com/Developer/Apps/Packages/23962](https://owner.roku.com/Developer/Apps/Packages/23962)
+
 Debugging
 ---------
 
