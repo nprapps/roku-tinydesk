@@ -66,7 +66,7 @@ http://sdkdocs.roku.com/display/RokuSDKv48/Channel+Packaging+And+Publishing#Chan
 Distributing the app to Roku requires jumping through additional hoops. First, you'll need to generate crypotgraphic keys on your Roku. Do this like so:
 
 ```
-$ telnet $ROKU_IP
+$ telnet $ROKU_IP 8080
 > genkey
 ```
 
