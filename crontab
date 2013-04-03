@@ -1,1 +1,1 @@
-* * * * * ubuntu bash /home/ubuntu/apps/app-template/repository/cron.sh python update_feed.py 
+* * * * * ubuntu bash /home/ubuntu/apps/roku-tinydesk/repository/cron.sh python update_feed.py 
