@@ -1,1 +1,1 @@
-* * * * * ubuntu bash /home/ubuntu/apps/roku-tinydesk/repository/cron.sh python update_feed.py 
+0 */2 * * * ubuntu bash /home/ubuntu/apps/roku-tinydesk/repository/cron.sh python update_feed.py 
