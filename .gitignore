@@ -4,3 +4,4 @@
 *.swo
 feed.json
 missing_mp4s.txt
+*.pyc

@@ -12,8 +12,10 @@ import unicodedata
 from dateutil.parser import parse
 import requests
 
+import app_config
+
 BITRATES = [200000, 500000, 1000000, 2000000]
-UPLOAD_CMD = 's3cmd -P --add-header=Cache-Control:max-age=5 --add-header=Content-encoding:gzip --guess-mime-type sync feed.json s3://apps.npr.org/roku-tinydesk/'
+UPLOAD_CMD = 's3cmd -P --add-header=Cache-Control:max-age=5 --add-header=Content-encoding:gzip --guess-mime-type sync feed.json s3://%s/roku-tinydesk/' % app_config.S3_BUCKETS[0]
 
 class MLStripper(HTMLParser):
     def __init__(self):
@@ -116,7 +118,10 @@ def main():
 
     print 'Deploying to S3'
 
+    print UPLOAD_CMD
     subprocess.Popen(shlex.split(UPLOAD_CMD), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    print 'Done!'
 
 def searchify_title(title):
     return ''.join(x for x in unicodedata.normalize('NFKD', title) if x in string.printable)
