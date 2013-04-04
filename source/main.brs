@@ -29,7 +29,7 @@ function initTheme()
     theme = createObject("roAssociativeArray")
     
     ' General
-    theme.backgroundColor = "#0F0F0F"
+    theme.backgroundColor = "#141414"
 
     ' Overhang
     theme.overhangSliceSD = "pkg:/images/overhang_sd.png"
@@ -41,11 +41,14 @@ function initTheme()
     theme.gridScreenOverhangHeightHD = "69"
     theme.gridScreenOverhangHeightSD = "49"
 
-    theme.gridScreenBackgroundColor = "#0F0F0F"
+    theme.gridScreenBackgroundColor = "#141414"
+    theme.gridScreenMessageColor = "#ebebeb"
+    theme.gridScreenRetrievingColor = "#ebebeb"
+    theme.gridScreenListNameColor = "#ebebeb"
 
     ' The search screen
-    theme.backgroundColor = "#000000"
-    theme.buttonMenuNormalText = "#FFFFFF"
+    theme.backgroundColor = "#141414"
+    theme.buttonMenuNormalText = "#ebebeb"
     
     app.setTheme(theme) 
     
