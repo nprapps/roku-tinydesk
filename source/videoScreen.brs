@@ -21,11 +21,71 @@ function VideoScreen_play(contentItem) as Boolean
 
     this = m
     globals = getGlobalAA()
-    
-    this._port = CreateObject("roMessagePort")
-    this._screen = CreateObject("roVideoScreen")
-    this._screen.setMessagePort(this._port)
 
+    this._wrapper = createObject("roImageCanvas")
+    this._wrapper.show()
+    
+    this._port = createObject("roMessagePort")
+    this._canvas = createObject("roImageCanvas")
+    this._player = createObject("roVideoPlayer")
+
+    this._canvas.setMessagePort(this._port)
+    this._player.setMessagePort(this._port)
+
+    ' PREROLL AD
+    this._canvas.setLayer(0, { text: "Your video will begin after this message" })
+    this._canvas.show()
+
+    adComplete = true
+
+    this._player.setDestinationRect(this._canvas.getCanvasRect())
+    this._player.addContent({
+        streamQualities: ["SD"],
+        streamBitrates: [195],
+        streamFormat: "mp4",
+        streamUrls: ["http://techslides.com/demos/sample-videos/small.mp4"],
+    })
+    this._player.play()
+
+    while true
+        msg = wait(0, this._port)
+
+        if type(msg) = "roVideoPlayerEvent"
+            if msg.isScreenClosed()
+                adComplete = false
+                exit while
+            else if msg.isFullResult()
+                exit while
+            else if msg.isStatusMessage()
+                print msg.getMessage()
+                if msg.getMessage() = "start of play"
+                    ' Can't I just call clearLayer()?
+                    this._canvas.setLayer(0, { color: "#141414", compositionMode: "source" })
+                    ' Docs say setLayer does this anyway?
+                    this._canvas.show()
+                end if
+            end if
+        else if type(msg) = "roImageCanvasEvent"
+            if msg.isRemoteKeyPressed()
+                index = msg.getIndex()
+
+                ' Back or Up to exit
+                if index = 0 or index = 2
+                    adComplete = false
+                    exit while
+                end if
+            end if
+        end if
+    end while
+
+    this._player.stop()
+    this._canvas.close()
+
+    if adComplete = false
+        return false
+    end if
+
+    ' MAIN VIDEO
     watched = false
     position = loadPosition(contentItem)
     contentItem.playStart = position
@@ -38,9 +98,15 @@ function VideoScreen_play(contentItem) as Boolean
 
     print "Video playback will begin at: " position 
 
+    this._port = createObject("roMessagePort")
+    this._screen = createObject("roVideoScreen")
+    this._screen.setMessagePort(this._port)
+
     this._screen.setPositionNotificationPeriod(1)
     this._screen.setContent(contentItem)
     this._screen.show()
+
+    this._wrapper.close()
 
     while true
         msg = wait(0, this._port)
