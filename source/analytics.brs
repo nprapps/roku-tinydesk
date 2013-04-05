@@ -56,7 +56,7 @@ function Analytics() as Object
     this.baseUrl = this.baseUrl + "?utmwv=1"
     this.baseUrl = this.baseUrl + "&utmsr=" + screenSize.w.toStr() + "x" + screenSize.h.toStr()
     this.baseUrl = this.baseUrl + "&utmsc=24-bit"
-    this.baseUrl = this.baseUrl + "&utmul=en-us"
+    this.baseUrl = this.baseUrl + "&utmul=" + device.getCurrentLocale()
     this.baseUrl = this.baseUrl + "&utmje=0"
     this.baseUrl = this.baseUrl + "&utmfl=-"
     this.baseUrl = this.baseUrl + "&utmdt=" + xfer.Escape(this.appName)
@@ -137,16 +137,21 @@ end function
 function Analytics_startup()
 
     this = m 
+    
+    device = createObject("roDeviceInfo")
 
     lastSessionDuration = RegRead("sessionDuration", "analytics", "0").toInt()
 
     if lastSessionDuration > 0 then
         lastSessionWatched = RegRead("sessionNumWatched", "analytics", "0").toInt()
         lastSessionFinished = RegRead("sessionNumFinished", "analytics", "0").toInt()
-        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [{ name: "numWatched", value: lastSessionWatched }, { name: "numFinished", value: lastSessionFinished }])
+        this.trackEvent("Tiny Desk", "Shutdown", "", lastSessionDuration.toStr(), [{ name: "numWatched", value: lastSessionWatched.toStr() }, { name: "numFinished", value: lastSessionFinished.toStr() }])
     end if
 
-    this.trackEvent("Tiny Desk", "Startup", "", "", [])
+    this.trackEvent("Tiny Desk", "Startup", "", "", [
+        { name: "rokuModel", value: device.getModelDisplayName() },
+        { name: "rokuFirmware", value: device.getVersion().mid(2, 4) }
+    ])
 
 end function
 
@@ -205,7 +210,7 @@ Function _Analytics_formatCustomVars(vars) As String
             end if
 
             names = names + prefix + xfer.Escape(vars[i].name)
-            values = values + prefix + xfer.Escape(vars[i].value.toStr())
+            values = values + prefix + xfer.Escape(vars[i].value)
 
             if vars[i] <> invalid then
                 scope = "3"
