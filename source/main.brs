@@ -7,6 +7,7 @@ function Main()
     globals = getGlobalAA()
 
     globals.analytics = Analytics()
+    globals.USE_ADS = false 
 
     print "Starting up"
     globals.analytics.startup()
