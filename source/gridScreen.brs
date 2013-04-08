@@ -14,6 +14,8 @@ function GridScreen() as Object
     this.WATCHED = 3
     this.SEARCH = 4
 
+    this.NEW_LIST_LENGTH = 5
+
     this.SEARCH_ITEM = {
         id: "search",
         title: "Search",
@@ -132,6 +134,7 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
     ' Add vid to watched list
     this._lists[this.WATCHED].unshift(contentItem)
 
+    this._screen.setContentList(this.UNWATCHED, this._lists[this.UNWATCHED])
     this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
 
     this._videoScreen.close()
@@ -185,13 +188,18 @@ function _GridScreen_initLists()
         this._lists[i] = []
     end for
 
-    for each contentItem in this._feed 
+    for i = 0 to this._feed.count() - 1
+        contentItem = this._feed[i] 
         contentItem["lastWatched"] = getLastWatched(contentItem)
 
         if contentItem["lastWatched"] = invalid then
-            this._lists[this.UNWATCHED].Push(contentItem)
+            this._lists[this.UNWATCHED].push(contentItem)
         else
-            this._lists[this.WATCHED].Push(contentItem)
+            this._lists[this.WATCHED].push(contentItem)
+        end if
+
+        if i < this.NEW_LIST_LENGTH then
+            this._lists[this.NEW].push(contentItem)
         end if
     end for
     
@@ -206,7 +214,7 @@ function _GridScreen_initLists()
         this._screen.setFocusedListItem(i, 0)
     end for
 
-    this._screen.setFocusedListItem(this.UNWATCHED, 0)
+    this._screen.setFocusedListItem(this.NEW, 0)
 
     this._screen.show()
 
