@@ -8,11 +8,11 @@ function GridScreen() as Object
     ' Member vars
     this = {}
     
-    this.ALL = 0
-    this.RECENT = 1
-    this.SEARCH = 2
-
-    this.MAX_AGE_FOR_RECENT_LIST = 60 * 60 * 24 * 14
+    this.NEW = 0
+    this.BEST_OF = 1
+    this.UNWATCHED = 2
+    this.WATCHED = 3
+    this.SEARCH = 4
 
     this.SEARCH_ITEM = {
         id: "search",
@@ -28,7 +28,7 @@ function GridScreen() as Object
     this._searchScreen = SearchScreen()
 
     this._feed = []
-    this._titles = ["All", "Recently watched", "Search"]
+    this._titles = ["New", "Best of", "Unwatched", "Watched", "Search"]
     this._lists = []
     this._lastSearch = ""
     
@@ -104,28 +104,39 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
     this = m
 
     watched = this._videoScreen.play(contentItem, fromList, searchTerm)
+    lastWatched = contentItem["lastWatched"] 
     setLastWatched(contentItem)
 
     if watched then
         markAsWatched(contentItem)
     end if
 
-    ' Remove vid from recent list if it already exists
-    for i = 0 to this._lists[this.RECENT].count() - 1
-        if this._lists[this.RECENT][i].id = contentItem.id then
-            this._lists[this.RECENT].delete(i)
-            exit for
-        end if
-    end for
+    if lastWatched = invalid then
+        ' Remove vid from unwatched list
+        for i = 0 to this._lists[this.UNWATCHED].count() - 1
+            if this._lists[this.UNWATCHED][i].id = contentItem.id then
+                this._lists[this.UNWATCHED].delete(i)
+                exit for
+            end if
+        end for
+    else
+        ' Remove vid from watched list if it already exists
+        for i = 0 to this._lists[this.WATCHED].count() - 1
+            if this._lists[this.WATCHED][i].id = contentItem.id then
+                this._lists[this.WATCHED].delete(i)
+                exit for
+            end if
+        end for
+    end if
     
-    ' Add vid to recent list
-    this._lists[this.RECENT].unshift(contentItem)
+    ' Add vid to watched list
+    this._lists[this.WATCHED].unshift(contentItem)
 
-    this._screen.setContentList(this.RECENT, this._lists[this.RECENT])
+    this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
 
     this._videoScreen.close()
 
-    this._screen.setFocusedListItem(this.RECENT, 0)
+    this._screen.setFocusedListItem(this.WATCHED, 0)
 
 end function
 
@@ -174,21 +185,17 @@ function _GridScreen_initLists()
         this._lists[i] = []
     end for
 
-    now = createObject("roDateTime").asSeconds()
-    threshold = now - this.MAX_AGE_FOR_RECENT_LIST 
-
     for each contentItem in this._feed 
         contentItem["lastWatched"] = getLastWatched(contentItem)
 
-        if contentItem["lastWatched"] <> invalid then
-            if contentItem["lastWatched"] > threshold then
-                this._lists[this.RECENT].Push(contentItem)
-            end if
+        if contentItem["lastWatched"] = invalid then
+            this._lists[this.UNWATCHED].Push(contentItem)
+        else
+            this._lists[this.WATCHED].Push(contentItem)
         end if
     end for
     
-    this._lists[this.ALL] = this._feed
-    sortBy(this._lists[this.RECENT], "lastWatched", False)
+    sortBy(this._lists[this.WATCHED], "lastWatched", False)
     this._lists[this.SEARCH] = [this.SEARCH_ITEM]
 
     this._screen.setupLists(this._titles.count())
@@ -199,7 +206,7 @@ function _GridScreen_initLists()
         this._screen.setFocusedListItem(i, 0)
     end for
 
-    this._screen.setFocusedListItem(this.ALL, 0)
+    this._screen.setFocusedListItem(this.UNWATCHED, 0)
 
     this._screen.show()
 
