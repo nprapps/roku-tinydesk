@@ -18,7 +18,7 @@ function VideoScreen()
 end function
 
 ' Play a video and return if it was completely watched
-function VideoScreen_play(contentItem, fromList) as Boolean
+function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
 
     this = m
     globals = getGlobalAA()
@@ -26,6 +26,8 @@ function VideoScreen_play(contentItem, fromList) as Boolean
     watched = false
     position = loadPosition(contentItem)
     contentItem.playStart = position
+
+    adPlayed = false
 
     if globals.USE_ADS and position = 0
         this._wrapper = createObject("roImageCanvas")
@@ -36,13 +38,15 @@ function VideoScreen_play(contentItem, fromList) as Boolean
         if not adComplete
             return false
         end if
+
+        adPlayed = true
     end if
 
     ' MAIN VIDEO
     if position > 0 then
-        globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [{ name: "fromList", value: fromList }])
+        globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [{ name: "fromList", value: fromList }, { name: "searchTerm", value: searchTerm }])
     else
-        globals.analytics.trackEvent("Tiny Desk", "Start", contentItem.Title, "", [{ name: "fromList", value: fromList }])
+        globals.analytics.trackEvent("Tiny Desk", "Start", contentItem.Title, "", [{ name: "fromList", value: fromList }, { name: "searchTerm", value: searchTerm }])
     end if
 
     print "Video playback will begin at: " position 
@@ -55,7 +59,7 @@ function VideoScreen_play(contentItem, fromList) as Boolean
     this._screen.setContent(contentItem)
     this._screen.show()
 
-    if globals.USE_ADS
+    if adPlayed
         this._wrapper.close()
     end if
 

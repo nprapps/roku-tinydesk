@@ -30,6 +30,7 @@ function GridScreen() as Object
     this._feed = []
     this._titles = ["All", "Recently watched", "Search"]
     this._lists = []
+    this._lastSearch = ""
     
     ' Member functions
     this.run = GridScreen_run
@@ -78,7 +79,13 @@ function GridScreen_run()
             if contentItem.id = "search" then
                 this._search()
             else
-                this._watch(contentItem, this._titles[selected_list])
+                if selected_list = this.SEARCH
+                    searchTerm = this._lastSearch
+                else
+                    searchTerm = ""
+                end if
+
+                this._watch(contentItem, this._titles[selected_list], searchTerm)
             end if
         else if msg.isRemoteKeyPressed() then
             if msg.getIndex() = 10 then
@@ -92,11 +99,11 @@ function GridScreen_run()
 end function
 
 ' Watch a video selected from the grid
-function _GridScreen_watch(contentItem, fromList)
+function _GridScreen_watch(contentItem, fromList, searchTerm)
 
     this = m
 
-    watched = this._videoScreen.play(contentItem, fromList)
+    watched = this._videoScreen.play(contentItem, fromList, searchTerm)
     setLastWatched(contentItem)
 
     if watched then
@@ -132,10 +139,12 @@ function _GridScreen_search()
     this._lists[this.SEARCH] = this._searchScreen.getMatches()
     this._lists[this.SEARCH].unshift(this.SEARCH_ITEM)
 
+    this._lastSearch = this._searchScreen.getQuery()
+
     if this._lists[this.SEARCH].count() = 1 then
         this._screen.setListName(this.SEARCH, "Search")
     else
-        this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._searchScreen.getQuery() + chr(34)) 
+        this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._lastSearch + chr(34)) 
     end if
     
     this._screen.setContentList(this.SEARCH, this._lists[this.SEARCH])
@@ -148,7 +157,7 @@ function _GridScreen_search()
     ' One result
     else if this._lists[this.SEARCH].count() = 2 then
         contentItem = this._lists[this.SEARCH][1]
-        this._watch(contentItem, this._titles[this.SEARCH])
+        this._watch(contentItem, this._titles[this.SEARCH], this._lastSearch)
     ' Multiple results
     else
         this._screen.setFocusedListItem(this.SEARCH, 1)
