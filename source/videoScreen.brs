@@ -78,13 +78,15 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
             watched = True
             playtime = position - contentItem.playStart
 
-            globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [])
+            globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [{ name: "stoppedAtPct", value: "100" }])
             globals.analytics.trackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
 
             exit while
         else if msg.isPartialResult()
             playtime = position - contentItem.playStart
-            globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [])
+            stoppedAtPct = int(position / contentItem.length * 100)
+
+            globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [{ name: "stoppedAtPct", value: stoppedAtPct.toStr() }])
 
             ' If user watched more than 95% count video as watched
             if position >= int(contentItem.Length * 0.95) then

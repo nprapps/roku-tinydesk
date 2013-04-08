@@ -109,7 +109,7 @@ The following events are tracked in Google Analytics:
 |Tiny Desk|Start|`title`||`fromList`|`searchTerm`|
 |Tiny Desk|Continue|`title`||`fromList`|`searchTerm`|
 |Tiny Desk|Finish|`title`||||
-|Tiny Desk|Stop|`title`|`playtime`|||
+|Tiny Desk|Stop|`title`|`playtime`|`stoppedAtPct`||
 |Tiny Desk|Search|`term`||||
 
 **Notes**:
