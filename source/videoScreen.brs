@@ -18,7 +18,7 @@ function VideoScreen()
 end function
 
 ' Play a video and return if it was completely watched
-function VideoScreen_play(contentItem) as Boolean
+function VideoScreen_play(contentItem, fromList) as Boolean
 
     this = m
     globals = getGlobalAA()
@@ -40,9 +40,9 @@ function VideoScreen_play(contentItem) as Boolean
     contentItem.playStart = position
 
     if position > 0 then
-        globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [])
+        globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [{ name: "fromList", value: fromList }])
     else
-        globals.analytics.trackEvent("Tiny Desk", "Start", contentItem.Title, "", [])
+        globals.analytics.trackEvent("Tiny Desk", "Start", contentItem.Title, "", [{ name: "fromList", value: fromList }])
     end if
 
     print "Video playback will begin at: " position 

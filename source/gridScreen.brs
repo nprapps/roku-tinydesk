@@ -78,7 +78,7 @@ function GridScreen_run()
             if contentItem.id = "search" then
                 this._search()
             else
-                this._watch(contentItem)
+                this._watch(contentItem, this._titles[selected_list])
             end if
         else if msg.isRemoteKeyPressed() then
             if msg.getIndex() = 10 then
@@ -92,11 +92,11 @@ function GridScreen_run()
 end function
 
 ' Watch a video selected from the grid
-function _GridScreen_watch(contentItem)
+function _GridScreen_watch(contentItem, fromList)
 
     this = m
 
-    watched = this._videoScreen.play(contentItem)
+    watched = this._videoScreen.play(contentItem, fromList)
     setLastWatched(contentItem)
 
     if watched then
@@ -148,7 +148,7 @@ function _GridScreen_search()
     ' One result
     else if this._lists[this.SEARCH].count() = 2 then
         contentItem = this._lists[this.SEARCH][1]
-        this._watch(contentItem)
+        this._watch(contentItem, this._titles[this.SEARCH])
     ' Multiple results
     else
         this._screen.setFocusedListItem(this.SEARCH, 1)

@@ -106,8 +106,8 @@ The following events are tracked in Google Analytics:
 |--------|------|-----|-----|--------|--------|
 |Tiny Desk|Startup|||`rokuModel`|`rokuFirmware`|
 |Tiny Desk|Shutdown||`sessionDuration`|`numWatched`|`numFinished`|
-|Tiny Desk|Start|`title`||||
-|Tiny Desk|Continue|`title`||||
+|Tiny Desk|Start|`title`||`fromList`||
+|Tiny Desk|Continue|`title`||`fromList`||
 |Tiny Desk|Finish|`title`||||
 |Tiny Desk|Stop|`title`|`playtime`|||
 |Tiny Desk|Search|`term`||||
