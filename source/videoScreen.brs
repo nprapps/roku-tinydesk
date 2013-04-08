@@ -23,7 +23,11 @@ function VideoScreen_play(contentItem, fromList) as Boolean
     this = m
     globals = getGlobalAA()
 
-    if globals.USE_ADS
+    watched = false
+    position = loadPosition(contentItem)
+    contentItem.playStart = position
+
+    if globals.USE_ADS and position = 0
         this._wrapper = createObject("roImageCanvas")
         this._wrapper.show()
 
@@ -35,10 +39,6 @@ function VideoScreen_play(contentItem, fromList) as Boolean
     end if
 
     ' MAIN VIDEO
-    watched = false
-    position = loadPosition(contentItem)
-    contentItem.playStart = position
-
     if position > 0 then
         globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [{ name: "fromList", value: fromList }])
     else
