@@ -114,14 +114,30 @@ function _VideoScreen_playAd()
 
     timestamp = createObject("roDateTime").asSeconds()
 
-    data = http_get_with_retry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=&correlator=" + timestamp.toStr(), 1500, 0)
+    data = http_get_with_retry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&correlator=" + timestamp.toStr(), 1500, 0)
+
+    if data = ""
+        print "VAST response was empty or request failed."
+        return true
+    end if
 
     vast = createObject("roXmlElement")
     vast.parse(data)
 
-    media = vast.Ad.InLine.Creatives.Creative.Linear.MediaFiles.MediaFile
+    if vast.Ad.count() = 0
+        print "VAST response did not contain an ad."
+        return true
+    end if
+
     mp4 = invalid
     bitrate = invalid
+
+    media = vast.Ad.InLine.Creatives.Creative.Linear.MediaFiles.MediaFile
+
+    if media.count() = 0
+        print "VAST response did not contain videos."
+        return true
+    end if
 
     for each video in media
         if video@type = "video/mp4"
@@ -132,7 +148,7 @@ function _VideoScreen_playAd()
     end for
 
     if mp4 = invalid
-        print "No mp4 url found in VAST XML." 
+        print "VAST did not contain an MP4 video url." 
         return true
     end if
 
