@@ -42,7 +42,6 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
         adPlayed = true
     end if
 
-    ' MAIN VIDEO
     if position > 0 then
         globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [{ name: "fromList", value: fromList }, { name: "searchTerm", value: searchTerm }])
     else
@@ -159,7 +158,6 @@ function _VideoScreen_playAd()
     this._canvas.setMessagePort(this._port)
     this._player.setMessagePort(this._port)
 
-    ' PREROLL AD
     this._canvas.setLayer(0, { text: "Your video will begin after this message" })
     this._canvas.show()
 
@@ -173,6 +171,7 @@ function _VideoScreen_playAd()
         streamUrls: [mp4]
     })
     this._player.play()
+    paused = false
 
     while true
         msg = wait(0, this._port)
@@ -199,6 +198,14 @@ function _VideoScreen_playAd()
                 if index = 0 or index = 2
                     adComplete = false
                     exit while
+                else if index = 13
+                    if paused
+                        this._player.pause()
+                        paused = true
+                    else
+                        this._player.resume()
+                        paused = false
+                    end if
                 end if
             end if
         end if
