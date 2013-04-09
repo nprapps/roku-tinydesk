@@ -27,9 +27,11 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
     position = loadPosition(contentItem)
     contentItem.playStart = position
 
+    timestamp = createObject("roDateTime").asSeconds()
+
     adPlayed = false
 
-    if globals.USE_ADS and position = 0 and globals.firstPlay = false
+    if globals.USE_ADS and position = 0 and globals.firstPlay = false and timestamp - globals.lastAdTimestamp > globals.TIME_BETWEEN_ADS 
         this._wrapper = createObject("roImageCanvas")
         this._wrapper.show()
 
@@ -40,6 +42,8 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
         end if
 
         adPlayed = true
+
+        globals.lastAdTimestamp = timestamp
     end if
     
     ' Users get to skip one ad for free

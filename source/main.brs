@@ -8,7 +8,9 @@ function Main()
 
     globals.analytics = Analytics()
     globals.USE_ADS = true 
+    globals.TIME_BETWEEN_ADS = 60 * 60
     globals.firstPlay = true
+    globals.lastAdTimestamp = 0 
 
     print "Starting up"
     globals.analytics.startup()
