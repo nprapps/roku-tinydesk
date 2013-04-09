@@ -131,7 +131,7 @@ function _VideoScreen_playAd()
         streamQualities: ["SD"],
         streamBitrates: [195],
         streamFormat: "mp4",
-        streamUrls: ["http://techslides.com/demos/sample-videos/small.mp4"],
+        streamUrls: ["http://redirector.c.googlesyndication.com/videoplayback/id/247bf01a3440d28a/itag/18/source/gfp_video_ads/ip/0.0.0.0/ipbits/0/expire/1365540117/sparams/ip,ipbits,expire,id,itag,source/signature/5DE140B603AAAC3B2B8E07BE1E724C2EAB3A628D.1153FE23DAB993B63D79EA95BF012EDE4B68E880/key/ck2/file/file.mp4"]
     })
     this._player.play()
 
