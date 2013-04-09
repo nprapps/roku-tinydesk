@@ -8,6 +8,7 @@ function Main()
 
     globals.analytics = Analytics()
     globals.USE_ADS = true 
+    globals.firstPlay = true
 
     print "Starting up"
     globals.analytics.startup()

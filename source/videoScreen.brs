@@ -29,7 +29,7 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
 
     adPlayed = false
 
-    if globals.USE_ADS and position = 0
+    if globals.USE_ADS and position = 0 and globals.firstPlay = false
         this._wrapper = createObject("roImageCanvas")
         this._wrapper.show()
 
@@ -41,6 +41,9 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
 
         adPlayed = true
     end if
+    
+    ' Users get to skip one ad for free
+    globals.firstPlay = false
 
     if position > 0 then
         globals.analytics.trackEvent("Tiny Desk", "Continue", contentItem.Title, "", [{ name: "fromList", value: fromList }, { name: "searchTerm", value: searchTerm }])
