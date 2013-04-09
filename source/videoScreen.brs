@@ -112,7 +112,30 @@ function _VideoScreen_playAd()
 
     this = m
 
-    
+    timestamp = createObject("roDateTime").asSeconds()
+
+    data = http_get_with_retry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=&correlator=" + timestamp.toStr(), 1500, 0)
+
+    vast = createObject("roXmlElement")
+    vast.parse(data)
+
+    media = vast.Ad.InLine.Creatives.Creative.Linear.MediaFiles.MediaFile
+    mp4 = invalid
+    bitrate = invalid
+
+    for each video in media
+        if video@type = "video/mp4"
+            mp4 = video.getText()
+            bitrate = video@bitrate
+            exit for
+        end if
+    end for
+
+    if mp4 = invalid
+        print "No mp4 url found in VAST XML." 
+        return true
+    end if
+
     this._port = createObject("roMessagePort")
     this._canvas = createObject("roImageCanvas")
     this._player = createObject("roVideoPlayer")
@@ -129,9 +152,9 @@ function _VideoScreen_playAd()
     this._player.setDestinationRect(this._canvas.getCanvasRect())
     this._player.addContent({
         streamQualities: ["SD"],
-        streamBitrates: [195],
+        streamBitrates: [bitrate],
         streamFormat: "mp4",
-        streamUrls: ["http://redirector.c.googlesyndication.com/videoplayback/id/247bf01a3440d28a/itag/18/source/gfp_video_ads/ip/0.0.0.0/ipbits/0/expire/1365540117/sparams/ip,ipbits,expire,id,itag,source/signature/5DE140B603AAAC3B2B8E07BE1E724C2EAB3A628D.1153FE23DAB993B63D79EA95BF012EDE4B68E880/key/ck2/file/file.mp4"]
+        streamUrls: [mp4]
     })
     this._player.play()
 

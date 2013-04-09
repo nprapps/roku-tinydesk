@@ -22,6 +22,9 @@ Function http_get_with_retry(url, timeout=1500, retries=5) as String
 
     response = ""
 
+    ' Always try at least once!
+    retries = retries + 1
+
     while retries > 0
         if xfer.AsyncGetToString() then
             event = wait(timeout, port)
