@@ -9,7 +9,7 @@ function GridScreen() as Object
     this = {}
     
     this.NEW = 0
-    this.BEST_OF = 1
+    this.HITS = 1
     this.UNWATCHED = 2
     this.WATCHED = 3
     this.SEARCH = 4
@@ -196,6 +196,10 @@ function _GridScreen_initLists()
             this._lists[this.UNWATCHED].push(contentItem)
         else
             this._lists[this.WATCHED].push(contentItem)
+        end if
+
+        if contentItem["greatestHit"] then
+            this._lists[this.HITS].push(contentItem)
         end if
 
         if i < this.NEW_LIST_LENGTH then

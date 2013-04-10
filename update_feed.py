@@ -34,6 +34,9 @@ def strip_tags(html):
     return s.get_data()
 
 def main():
+    with open('greatest_hits.txt') as f:
+        greatest_hits = [l.strip() for l in f]
+
     output = []
     page = 0
 
@@ -71,7 +74,8 @@ def main():
                 'streamUrls': [],
                 'streamQualities': [],
                 'isHD': True,
-                'hdBranded': True
+                'hdBranded': True,
+                'greatestHit': story['id'] in greatest_hits
             }
 
             alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
@@ -82,7 +86,6 @@ def main():
 
             # Formatted as: "Mon, 11 Mar 2013 14:03:00 -0400"
             story_date = story['storyDate']['$text']
-            print story_date
             dt = parse(story_date)
 
             item['tempDate'] = dt
