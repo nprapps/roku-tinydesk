@@ -81,9 +81,11 @@ def main():
             item['hdPosterUrl'] = alt_image_url.replace(' ', '%20') + '?s=3'
 
             # Formatted as: "Mon, 11 Mar 2013 14:03:00 -0400"
-            pub_date = story['pubDate']['$text']
-            dt = parse(pub_date)
+            story_date = story['storyDate']['$text']
+            print story_date
+            dt = parse(story_date)
 
+            item['tempDate'] = dt
             item['releaseDate'] = dt.strftime('%B %d, %Y') 
 
             if 'mp4' not in story['multimedia'][0]['format']:
@@ -107,6 +109,12 @@ def main():
             output.append(item)
 
         page += 1
+
+    output = sorted(output, key=lambda k: k['tempDate'])
+    output.reverse()
+    
+    for item in output:
+        del item['tempDate']
 
     print 'Saving %i concerts' % len(output)
 
