@@ -183,38 +183,36 @@ function _VideoScreen_playAd()
     while true
         msg = wait(0, this._port)
 
-        if type(msg) = "roVideoPlayerEvent"
-            if msg.isScreenClosed()
+        if msg.isScreenClosed()
+            adComplete = false
+            exit while
+        else if msg.isFullResult()
+            exit while
+        else if msg.isStatusMessage()
+            if msg.getMessage() = "start of play"
+                ' Can't I just call clearLayer()?
+                this._canvas.setLayer(0, { color: "#14141400", compositionMode: "source" })
+                ' Docs say setLayer does this anyway?
+                this._canvas.show()
+            end if
+        else if msg.isRemoteKeyPressed()
+            index = msg.getIndex()
+
+            ' Back or Up to exit
+            if index = 0 or index = 2
                 adComplete = false
                 exit while
-            else if msg.isFullResult()
-                exit while
-            else if msg.isStatusMessage()
-                if msg.getMessage() = "start of play"
-                    ' Can't I just call clearLayer()?
-                    this._canvas.setLayer(0, { color: "#14141400", compositionMode: "source" })
-                    ' Docs say setLayer does this anyway?
-                    this._canvas.show()
+            else if index = 13
+                if paused
+                    this._player.resume()
+                else
+                    this._player.pause()
                 end if
             end if
-        else if type(msg) = "roImageCanvasEvent"
-            if msg.isRemoteKeyPressed()
-                index = msg.getIndex()
-
-                ' Back or Up to exit
-                if index = 0 or index = 2
-                    adComplete = false
-                    exit while
-                else if index = 13
-                    if paused
-                        this._player.pause()
-                        paused = true
-                    else
-                        this._player.resume()
-                        paused = false
-                    end if
-                end if
-            end if
+        else if msg.isPaused()
+            paused = true
+        else if msg.isResumed()
+            paused = false
         end if
     end while
 
