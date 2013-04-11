@@ -210,6 +210,9 @@ function _GridScreen_initLists()
     sortBy(this._lists[this.WATCHED], "lastWatched", False)
     this._lists[this.SEARCH] = [this.SEARCH_ITEM]
 
+    month_day = left(this._lists[this.NEW][0].releaseDate, len(this._lists[this.NEW][0].releaseDate) - 6)
+    this._titles[this.NEW] = "New (" + month_day + ")"
+
     this._screen.setupLists(this._titles.count())
     this._screen.setListNames(this._titles)
 
