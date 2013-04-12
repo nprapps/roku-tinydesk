@@ -38,6 +38,7 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
         adComplete = this._playAd()
 
         if not adComplete
+            this._wrapper.close()
             return false
         end if
 
