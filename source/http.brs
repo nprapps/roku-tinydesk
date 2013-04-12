@@ -3,22 +3,22 @@
 '
 
 ' Create a URL transfer object
-Function create_transfer(port, url)
+Function createTransfer(port, url)
 
-    xfer = CreateObject("roUrlTransfer")
-    xfer.SetPort(port)
-    xfer.SetUrl(url)
-    xfer.EnableEncodings(true)
+    xfer = createObject("roUrlTransfer")
+    xfer.setPort(port)
+    xfer.setUrl(url)
+    xfer.enableEncodings(true)
 
     return xfer
 
 End Function
 
 ' Request a URL with automated retries
-Function http_get_with_retry(url, timeout=1500, retries=5) as String
+Function httpGetWithRetry(url, timeout=5000, retries=5) as String
 
-    port = CreateObject("roMessagePort")
-    xfer = create_transfer(port, url)
+    port = createObject("roMessagePort")
+    xfer = createTransfer(port, url)
 
     response = ""
 
@@ -26,17 +26,17 @@ Function http_get_with_retry(url, timeout=1500, retries=5) as String
     retries = retries + 1
 
     while retries > 0
-        if xfer.AsyncGetToString() then
+        if xfer.asyncGetToString() then
             event = wait(timeout, port)
 
             if type(event) = "roUrlEvent"
-                response = event.GetString()
+                response = event.getString()
                 exit while        
             elseif event = invalid
-                xfer.AsyncCancel()
+                xfer.asyncCancel()
                 
                 ' Create a new transfer
-                xfer = create_transfer(port, url)
+                xfer = createTransfer(port, url)
 
                 ' Backoff
                 timeout = 2 * timeout
@@ -50,11 +50,3 @@ Function http_get_with_retry(url, timeout=1500, retries=5) as String
 
 End Function
 
-' Fetch a URL but ignore the reply
-Function http_get_ignore_response(url)
-
-    port = CreateObject("roMessagePort")
-    xfer = create_transfer(port, url)
-    xfer.GetToString()
-
-End Function

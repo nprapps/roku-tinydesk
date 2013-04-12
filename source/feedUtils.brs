@@ -5,7 +5,7 @@
 ' Fetch and parse the video feed
 function fetchFeed() as Object 
 
-    feed = http_get_with_retry("http://apps.npr.org/roku-tinydesk/feed.json")
+    feed = httpGetWithRetry("http://apps.npr.org/roku-tinydesk/feed.json")
 
     return ParseJSON(feed)
 

@@ -95,7 +95,7 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
             globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [{ name: "stoppedAtPct", value: stoppedAtPct.toStr() }])
 
             ' If user watched more than 95% count video as watched
-            if position >= int(contentItem.Length * 0.95) then
+            if position >= int(contentItem.length * 0.95) then
                 position = 0
                 savePosition(contentItem, position)
 
@@ -120,7 +120,7 @@ function _VideoScreen_playAd()
 
     timestamp = createObject("roDateTime").asSeconds()
 
-    data = http_get_with_retry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&correlator=" + timestamp.toStr(), 1500, 0)
+    data = httpGetWithRetry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&correlator=" + timestamp.toStr(), 2000, 0)
 
     if data = ""
         print "VAST response was empty or request failed."
