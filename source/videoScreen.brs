@@ -159,6 +159,20 @@ function _VideoScreen_playAd()
         return true
     end if
 
+    impression_url = vast.Ad.Inline.Impression.getText()
+    start_urls = []
+    complete_urls = []
+
+    events = vast.Ad.Inline.Creatives.Creative.Linear.TrackingEvents.Tracking
+
+    for each event in events
+        if event@event = "start" then
+            start_urls.push(event.getText())
+        else if event@event = "complete" then
+            complete_urls.push(event.getText())
+        end if
+    end for
+
     this._port = createObject("roMessagePort")
     this._canvas = createObject("roImageCanvas")
     this._player = createObject("roVideoPlayer")
@@ -188,14 +202,23 @@ function _VideoScreen_playAd()
             adComplete = false
             exit while
         else if msg.isFullResult()
-            exit while
-        else if msg.isStatusMessage()
-            if msg.getMessage() = "start of play"
-                ' Can't I just call clearLayer()?
-                this._canvas.setLayer(0, { color: "#14141400", compositionMode: "source" })
-                ' Docs say setLayer does this anyway?
-                this._canvas.show()
-            end if
+            for each url in complete_urls
+                httpGetWithRetry(url, 2000, 0)
+            end for
+
+           exit while
+        else if msg.isStreamStarted()
+            ' Can't I just call clearLayer()?
+            this._canvas.setLayer(0, { color: "#14141400", compositionMode: "source" })
+            ' Docs say setLayer does this anyway?
+            this._canvas.show()
+            
+            httpGetWithRetry(impression_url, 2000, 0)
+            
+            for each url in start_urls
+                httpGetWithRetry(url, 2000, 0)
+            end for
+
         else if msg.isRemoteKeyPressed()
             index = msg.getIndex()
 

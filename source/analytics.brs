@@ -128,7 +128,6 @@ function Analytics_trackEvent(category, action, label, value, customVars)
     url = url + "&utmt=event"
     url = url + "&utme=" + this._formatEvent(category, action, label, value) + this._formatCustomVars(customVars)
 
-    print "Analytics URL: " + url
     httpGetWithRetry(url, 2000, 0)
 
 end function

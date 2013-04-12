@@ -17,6 +17,8 @@ End Function
 ' Request a URL with automated retries
 Function httpGetWithRetry(url, timeout=5000, retries=5) as String
 
+    print "Requesting: " + url
+
     port = createObject("roMessagePort")
     xfer = createTransfer(port, url)
 
