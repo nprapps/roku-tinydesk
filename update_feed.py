@@ -89,7 +89,7 @@ def main():
             dt = parse(story_date)
 
             item['tempDate'] = dt
-            item['releaseDate'] = dt.strftime('%B %d, %Y') 
+            item['releaseDate'] = dt.strftime('%B ') + dt.strftime('%d, ').lstrip('0') + dt.strftime('%Y') 
 
             if 'mp4' not in story['multimedia'][0]['format']:
                 print '--> No mp4 video, skipping!'
