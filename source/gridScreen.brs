@@ -28,8 +28,8 @@ function GridScreen() as Object
     this._screen = createObject("roGridScreen")
     this._videoScreen = VideoScreen()
     this._searchScreen = SearchScreen()
+    this._interstitialScreen = InterstitialScreen() 
     this._wrapper = invalid
-    this._interstitial = invalid 
 
     this._feed = []
     this._titles = ["New", "Best of", "Unwatched", "Watched", "Search"]
@@ -43,7 +43,6 @@ function GridScreen() as Object
     this._initLists = _GridScreen_initLists
     this._beginWrapper = _GridScreen_beginWrapper
     this._endWrapper = _GridScreen_endWrapper
-    this._showInterstitial = _GridScreen_showInterstitial
 
     ' Setup
     this._screen.setMessagePort(this._port)
@@ -103,7 +102,7 @@ function GridScreen_run()
                     previousContentItem = contentItem
                     contentItem = this._lists[selected_list][selected_item]
                     
-                    playNext = this._showInterstitial(contentItem, previousContentItem)
+                    playNext = this._interstitialScreen.show(contentItem, previousContentItem)
                     
                     if playNext then
                         goto watchNext
@@ -266,74 +265,6 @@ function _GridScreen_endWrapper()
     this = m
 
     this._wrapper = invalid
-
-end function
-
-function _GridScreen_showInterstitial(nextContentItem, previousContentItem)
-
-    this = m
-
-    screen = createObject("roScreen")
-    screen.setMessagePort(this._port)
-    screen.clear(&h141414FF)
-
-    width = screen.getWidth()
-    height = screen.getHeight()
-    halfWidth = width / 2
-    halfHeight = height / 2
-    
-    fonts = createObject("roFontRegistry")
-    font = fonts.getDefaultFont(28, true, false)
-
-    lines = []
-
-    if previousContentItem <> invalid then
-        lines.push("Just played:")
-        lines.push(previousContentItem.title)
-        lines.push("")
-    end if
-
-    lines.push("Up next:")
-    lines.push(nextContentItem.title)
-
-    lines.push("")
-    lines.push("")
-    lines.push("Press Back or Up to return to the menu")
-
-    h = font.getOneLineHeight()
-    yOffset = halfHeight - ((h * lines.count()) / 2)
-
-    for i = 0 to lines.count() - 1
-        line = lines[i]
-        x = halfWidth - (font.getOneLineWidth(line, width) / 2)
-        y = yOffset + (h * i)
-
-        screen.drawText(line, x, y, &hEBEBEBFF, font) 
-    end for
-
-    screen.finish()
-
-    timer = createObject("roTimespan")
-    timer.mark()
-
-    playNext = true
-
-    while timer.totalSeconds() < 5
-        msg = wait(50, this._port)
-
-        if type(msg) = "roUniversalControlEvent" then
-            button = msg.getInt()
-
-            if button = 0 or button = 2 then
-                playNext = false 
-                exit while
-            end if
-        end if
-    end while
-
-    screen = invalid
-
-    return playNext
 
 end function
 

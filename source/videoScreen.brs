@@ -173,7 +173,7 @@ function _VideoScreen_playAd()
     this._canvas.setMessagePort(this._port)
     this._player.setMessagePort(this._port)
 
-    this._canvas.setLayer(0, { text: "Your video will begin after this message" })
+    this._canvas.setLayer(0, { text: "Retrieving..." })
     this._canvas.show()
 
     adComplete = true
