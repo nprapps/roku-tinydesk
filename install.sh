@@ -2,7 +2,7 @@
 
 ZIP_NAME="roku-tinydesk.zip"
 
-curl -s -S -F "mysubmit=Delete" -F "archive=" -F "passwd=" http://$ROKU_IP/plugin_install
+./uninstall.sh
 
 rm $ZIP_NAME;
 zip $ZIP_NAME -r -9 . -x ".git/*"
