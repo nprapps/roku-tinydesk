@@ -100,8 +100,14 @@ function GridScreen_run()
                 
                 if watched and selected_item < this._lists[selected_list].count() - 1 then
                     selected_item = selected_item + 1
+                    previousContentItem = contentItem
                     contentItem = this._lists[selected_list][selected_item]
-                    goto watchNext
+                    
+                    playNext = this._showInterstitial(contentItem, previousContentItem)
+                    
+                    if playNext then
+                        goto watchNext
+                    end if
                 end if
     
                 this._endWrapper()
@@ -121,8 +127,6 @@ end function
 function _GridScreen_watch(contentItem, fromList, searchTerm)
 
     this = m
-
-    this._showInterstitial(contentItem)
 
     watched = this._videoScreen.play(contentItem, fromList, searchTerm)
     lastWatched = contentItem["lastWatched"] 
@@ -251,9 +255,9 @@ function _GridScreen_beginWrapper()
 
     this = m
 
-    this._wrapper = createObject("roImageCanvas")
-    this._wrapper.setLayer(0, { color: "#141414", compositionMode: "source" })
-    this._wrapper.show()
+    this._wrapper = createObject("roScreen")
+    this._wrapper.clear(&h141414FF)
+    this._wrapper.finish()
 
 end function
 
@@ -261,15 +265,16 @@ function _GridScreen_endWrapper()
 
     this = m
 
-    this._wrapper.close()
+    this._wrapper = invalid
 
 end function
 
-function _GridScreen_showInterstitial(nextContentItem)
+function _GridScreen_showInterstitial(nextContentItem, previousContentItem)
 
     this = m
 
     screen = createObject("roScreen")
+    screen.setMessagePort(this._port)
     screen.clear(&h141414FF)
 
     width = screen.getWidth()
@@ -278,17 +283,22 @@ function _GridScreen_showInterstitial(nextContentItem)
     halfHeight = height / 2
     
     fonts = createObject("roFontRegistry")
-    font = fonts.getDefaultFont()
+    font = fonts.getDefaultFont(28, true, false)
 
-    lines = [
-        "Up next: " + nextContentItem.title,
-        "test",
-        "",
-        "blah",
-        "",
-        "",
-        "more stuff"
-    ]
+    lines = []
+
+    if previousContentItem <> invalid then
+        lines.push("Just played:")
+        lines.push(previousContentItem.title)
+        lines.push("")
+    end if
+
+    lines.push("Up next:")
+    lines.push(nextContentItem.title)
+
+    lines.push("")
+    lines.push("")
+    lines.push("Press Back or Up to return to the menu")
 
     h = font.getOneLineHeight()
     yOffset = halfHeight - ((h * lines.count()) / 2)
@@ -298,14 +308,32 @@ function _GridScreen_showInterstitial(nextContentItem)
         x = halfWidth - (font.getOneLineWidth(line, width) / 2)
         y = yOffset + (h * i)
 
-        screen.drawText(line, x, y, &hCCCCCCFF, font) 
+        screen.drawText(line, x, y, &hEBEBEBFF, font) 
     end for
 
     screen.finish()
 
-    sleep(5000)
+    timer = createObject("roTimespan")
+    timer.mark()
+
+    playNext = true
+
+    while timer.totalSeconds() < 5
+        msg = wait(50, this._port)
+
+        if type(msg) = "roUniversalControlEvent" then
+            button = msg.getInt()
+
+            if button = 0 or button = 2 then
+                playNext = false 
+                exit while
+            end if
+        end if
+    end while
 
     screen = invalid
+
+    return playNext
 
 end function
 
