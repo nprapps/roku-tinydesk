@@ -28,6 +28,7 @@ function GridScreen() as Object
     this._screen = createObject("roGridScreen")
     this._videoScreen = VideoScreen()
     this._searchScreen = SearchScreen()
+    this._wrapper = invalid
 
     this._feed = []
     this._titles = ["New", "Best of", "Unwatched", "Watched", "Search"]
@@ -39,6 +40,8 @@ function GridScreen() as Object
     this._watch = _GridScreen_watch
     this._search = _GridScreen_search
     this._initLists = _GridScreen_initLists
+    this._beginWrapper = _GridScreen_beginWrapper
+    this._endWrapper = _GridScreen_endWrapper
 
     ' Setup
     this._screen.setMessagePort(this._port)
@@ -81,13 +84,25 @@ function GridScreen_run()
             if contentItem.id = "search" then
                 this._search()
             else
+                this._beginWrapper()
+                
                 if selected_list = this.SEARCH
                     searchTerm = this._lastSearch
                 else
                     searchTerm = ""
                 end if
 
-                this._watch(contentItem, this._titles[selected_list], searchTerm)
+                watchNext:
+
+                watched = this._watch(contentItem, this._titles[selected_list], searchTerm)
+                
+                if watched and selected_item < this._lists[selected_list].count() - 1 then
+                    selected_item = selected_item + 1
+                    contentItem = this._lists[selected_list][selected_item]
+                    goto watchNext
+                end if
+    
+                this._endWrapper()
             end if
         else if msg.isRemoteKeyPressed() then
             if msg.getIndex() = 10 then
@@ -136,10 +151,9 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
 
     this._screen.setContentList(this.UNWATCHED, this._lists[this.UNWATCHED])
     this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
-
-    this._videoScreen.close()
-
     this._screen.setFocusedListItem(this.WATCHED, 0)
+
+    return watched
 
 end function
 
@@ -171,7 +185,9 @@ function _GridScreen_search()
     ' One result
     else if this._lists[this.SEARCH].count() = 2 then
         contentItem = this._lists[this.SEARCH][1]
+        this._beginWrapper()
         this._watch(contentItem, this._titles[this.SEARCH], this._lastSearch)
+        this._endWrapper()
     ' Multiple results
     else
         this._screen.setFocusedListItem(this.SEARCH, 1)
@@ -227,3 +243,19 @@ function _GridScreen_initLists()
 
 end function
 
+function _GridScreen_beginWrapper()
+
+    this = m
+
+    this._wrapper = createObject("roImageCanvas")
+    this._wrapper.show()
+
+end function
+
+function _GridScreen_endWrapper()
+
+    this = m
+
+    this._wrapper.close()
+
+end function

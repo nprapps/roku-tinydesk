@@ -10,7 +10,6 @@ function VideoScreen()
     
     ' Member functions
     this.play = VideoScreen_play
-    this.close = VideoScreen_close
     this._playAd = _VideoScreen_playAd
 
     return this
@@ -32,13 +31,9 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
     adPlayed = false
 
     if globals.USE_ADS and position = 0 and globals.firstPlay = false and timestamp - globals.lastAdTimestamp > globals.TIME_BETWEEN_ADS 
-        this._wrapper = createObject("roImageCanvas")
-        this._wrapper.show()
-
         adComplete = this._playAd()
 
         if not adComplete
-            this._wrapper.close()
             return false
         end if
 
@@ -65,10 +60,6 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
     this._screen.setPositionNotificationPeriod(1)
     this._screen.setContent(contentItem)
     this._screen.show()
-
-    if adPlayed
-        this._wrapper.close()
-    end if
 
     while true
         msg = wait(0, this._port)
@@ -109,6 +100,8 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
             savePosition(contentItem, position)
         end if
     end while
+
+    this._screen.close()
 
     return watched
 
@@ -247,11 +240,3 @@ function _VideoScreen_playAd()
 
 end function
 
-' Close the video screen, used to prevent flicker
-function VideoScreen_close()
-
-    this = m
-
-    this._screen.close()
-
-end function
