@@ -29,6 +29,7 @@ function GridScreen() as Object
     this._videoScreen = VideoScreen()
     this._searchScreen = SearchScreen()
     this._wrapper = invalid
+    this._interstitial = invalid 
 
     this._feed = []
     this._titles = ["New", "Best of", "Unwatched", "Watched", "Search"]
@@ -42,6 +43,7 @@ function GridScreen() as Object
     this._initLists = _GridScreen_initLists
     this._beginWrapper = _GridScreen_beginWrapper
     this._endWrapper = _GridScreen_endWrapper
+    this._showInterstitial = _GridScreen_showInterstitial
 
     ' Setup
     this._screen.setMessagePort(this._port)
@@ -119,6 +121,8 @@ end function
 function _GridScreen_watch(contentItem, fromList, searchTerm)
 
     this = m
+
+    this._showInterstitial(contentItem)
 
     watched = this._videoScreen.play(contentItem, fromList, searchTerm)
     lastWatched = contentItem["lastWatched"] 
@@ -248,6 +252,7 @@ function _GridScreen_beginWrapper()
     this = m
 
     this._wrapper = createObject("roImageCanvas")
+    this._wrapper.setLayer(0, { color: "#141414", compositionMode: "source" })
     this._wrapper.show()
 
 end function
@@ -259,3 +264,48 @@ function _GridScreen_endWrapper()
     this._wrapper.close()
 
 end function
+
+function _GridScreen_showInterstitial(nextContentItem)
+
+    this = m
+
+    screen = createObject("roScreen")
+    screen.clear(&h141414FF)
+
+    width = screen.getWidth()
+    height = screen.getHeight()
+    halfWidth = width / 2
+    halfHeight = height / 2
+    
+    fonts = createObject("roFontRegistry")
+    font = fonts.getDefaultFont()
+
+    lines = [
+        "Up next: " + nextContentItem.title,
+        "test",
+        "",
+        "blah",
+        "",
+        "",
+        "more stuff"
+    ]
+
+    h = font.getOneLineHeight()
+    yOffset = halfHeight - ((h * lines.count()) / 2)
+
+    for i = 0 to lines.count() - 1
+        line = lines[i]
+        x = halfWidth - (font.getOneLineWidth(line, width) / 2)
+        y = yOffset + (h * i)
+
+        screen.drawText(line, x, y, &hCCCCCCFF, font) 
+    end for
+
+    screen.finish()
+
+    sleep(5000)
+
+    screen = invalid
+
+end function
+
