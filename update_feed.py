@@ -41,6 +41,7 @@ def main():
     page = 0
 
     missing_mp4s = ''
+    zero_length = ''
 
     while True: 
         print 'Fetching page %i' % page
@@ -98,6 +99,12 @@ def main():
                 
                 continue
 
+            if item['length'] == 0:
+                print '--> Zero length, including anyway!'
+
+                zero_length += '%s, %s\n' % (item['id'], item['title'])
+
+
             video_url = story['multimedia'][0]['format']['mp4']['$text']
             
             for bitrate in BITRATES:
@@ -126,6 +133,9 @@ def main():
 
     with open('missing_mp4s.txt', 'w') as f:
         f.write(missing_mp4s)
+
+    with open('zero_length.txt', 'w') as f:
+        f.write(zero_length)
 
     print 'Deploying to S3'
 
