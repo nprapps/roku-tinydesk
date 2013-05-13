@@ -49,7 +49,7 @@ Package & Deploy
 To package up the code and deploy it to your Roku:
 
 ```
-$ ./build.sh
+$ ./install.sh
 ```
 
 Enjoy!
