@@ -31,7 +31,7 @@ function Analytics() as Object
 
     this = {}
 
-    this.account = "UA-39645840-3"
+    this.account = "UA-5828686-41"
     this.appName = "roku-tinydesk"
     this.domain = "apps.npr.org"
     this.numEvents = 0
