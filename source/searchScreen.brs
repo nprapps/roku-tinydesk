@@ -32,7 +32,7 @@ function SearchScreen_search(feed)
     this._screen = createObject("roSearchScreen")
 
     this._screen.setMessagePort(this._port) 
-    this._screen.setBreadcrumbText("", "Search")
+    this._screen.setBreadcrumbText("", "")
     this._screen.setSearchTermHeaderText("Suggestions:")
     this._screen.setSearchButtonText("search")
     this._screen.setClearButtonEnabled(false)

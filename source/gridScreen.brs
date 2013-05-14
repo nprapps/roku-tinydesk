@@ -19,9 +19,9 @@ function GridScreen() as Object
     this.SEARCH_ITEM = {
         id: "search",
         title: "Search",
-        description: "Search for an artist by name.",
-        sdPosterUrl: "http://apps.npr.org/roku-tinydesk/magnifying_glass.png",
-        hdPosterUrl: "http://apps.npr.org/roku-tinydesk/magnifying_glass.png"
+        'description: "Search for an artist by name.",
+        sdPosterUrl: "pkg:/images/search_hd.png",
+        hdPosterUrl: "pkg:/images/search_hd.png"
     }
 
     this._port = createObject("roMessagePort")
@@ -47,7 +47,7 @@ function GridScreen() as Object
     ' Setup
     this._screen.setMessagePort(this._port)
 
-    this._screen.setGridStyle("flat-landscape")
+    this._screen.setGridStyle("four-column-flat-landscape")
     this._screen.setDisplayMode("photo-fit")
     
     ' Always setup at least one list (keeps tooltips from appearing in the wrong place)
