@@ -24,7 +24,10 @@ function InterstitialScreen_show(nextContentItem, previousContentItem)
 
     screen = createObject("roScreen")
     port = createObject("roMessagePort")
-    screen.setMessagePort(port)
+
+    ' For Roku 1 compatability
+    ' See: http://sdkdocs.roku.com/display/sdkdoc/ifSetMessagePort
+    screen.setPort(port)
     screen.clear(&h141414FF)
 
     width = screen.getWidth()
