@@ -32,7 +32,7 @@ function GridScreen() as Object
     this._wrapper = invalid
 
     this._feed = []
-    this._titles = ["New", "Best of", "Unwatched", "Watched", "Search"]
+    this._titles = ["New", "Editor's Picks", "Unwatched", "Watched", "Search"]
     this._lists = []
     this._lastSearch = ""
     
