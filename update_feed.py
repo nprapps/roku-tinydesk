@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import csv
 from HTMLParser import HTMLParser
 import gzip
 import json
@@ -35,7 +36,8 @@ def strip_tags(html):
 
 def main():
     with open('greatest_hits.txt') as f:
-        greatest_hits = [l.strip() for l in f]
+        reader = csv.reader(f)
+        greatest_hits = [row[1].strip() for row in reader]
 
     output = []
     page = 0
