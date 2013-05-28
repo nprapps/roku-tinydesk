@@ -62,6 +62,7 @@ def setup():
     require('branch', provided_by=[stable, master, branch])
 
     setup_directories()
+    create_log_file()
     setup_virtualenv()
     clone_repo()
     checkout_latest()
@@ -74,6 +75,10 @@ def setup_directories():
     require('settings', provided_by=[production, staging])
 
     run('mkdir -p %(path)s' % env)
+
+def setup_log_file():
+    sudo('touch /var/log/%(deployed_name)s.log' % env)
+    sudo('chown %(user)s /var/log/%(deployed_name)s.log' % env)
 
 def setup_virtualenv():
     """

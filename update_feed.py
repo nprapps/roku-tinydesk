@@ -4,6 +4,7 @@ import csv
 from HTMLParser import HTMLParser
 import gzip
 import json
+import logging
 import os
 import shlex
 import string
@@ -17,6 +18,8 @@ import app_config
 
 BITRATES = [200000, 500000, 1000000, 2000000]
 UPLOAD_CMD = 's3cmd -P --add-header=Cache-Control:max-age=5 --add-header=Content-encoding:gzip --guess-mime-type sync feed.json s3://%s/roku-tinydesk/' % app_config.S3_BUCKETS[0]
+
+logging.basicConfig(filename='/var/log/roku-tinydesk.log', level=logging.DEBUG, format='%(asctime)s: %(message)s')
 
 class MLStripper(HTMLParser):
     def __init__(self):
@@ -46,20 +49,19 @@ def main():
     zero_length = ''
 
     while True: 
-        print 'Fetching page %i' % page
+        logging.info('Fetching page %i' % page)
         url = 'http://api.npr.org/query?id=92071316&apiKey=%s&output=json&startNum=%i&numResults=40' % (os.environ['NPR_API_KEY'], page * 40)
-        print url
+        logging.debug(url)
         response = requests.get(url)
 
         data = response.json() 
 
         if 'message' in data and data['message'][0]['id'] == '401':
-            print data['message']
             break
 
         for story in data['list']['story']:
             title = story['title']['$text'].replace(': Tiny Desk Concert', '')
-            print title
+            logging.debug(title)
 
             item = {
                 'id': story['id'],
@@ -95,14 +97,14 @@ def main():
             item['releaseDate'] = dt.strftime('%B ') + dt.strftime('%d, ').lstrip('0') + dt.strftime('%Y') 
 
             if 'mp4' not in story['multimedia'][0]['format']:
-                print '--> No mp4 video, skipping!'
+                logging.debug('--> No mp4 video, skipping!')
 
                 missing_mp4s += '%s, %s\n' % (item['id'], item['title'])
                 
                 continue
 
             if item['length'] == 0:
-                print '--> Zero length, including anyway!'
+                logging.debug('--> Zero length, including anyway!')
 
                 zero_length += '%s, %s\n' % (item['id'], item['title'])
 
@@ -128,7 +130,11 @@ def main():
     for item in output:
         del item['tempDate']
 
-    print 'Saving %i concerts' % len(output)
+    if len(output) < 200:
+        logging.error('Less than 200 concerts found--sanity check failed! Not updating feed.')
+        return
+
+    logging.info('Saving %i concerts' % len(output))
 
     with gzip.open('feed.json', 'wb') as f:
         f.write(json.dumps(output))
@@ -139,12 +145,12 @@ def main():
     with open('zero_length.txt', 'w') as f:
         f.write(zero_length)
 
-    print 'Deploying to S3'
+    logging.info('Deploying to S3')
 
-    print UPLOAD_CMD
+    logging.debug(UPLOAD_CMD)
     subprocess.Popen(shlex.split(UPLOAD_CMD), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    print 'Done!'
+    logging.info('Done!')
 
 def searchify_title(title):
     return ''.join(x for x in unicodedata.normalize('NFKD', title) if x in string.printable)
