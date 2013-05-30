@@ -63,6 +63,10 @@ def main():
             title = story['title']['$text'].replace(': Tiny Desk Concert', '')
             logging.debug(title)
 
+            if 'multimedia' not in story or len(story['multimedia']) == 0:
+                logging.info('--> No multimedia element, skipping!')
+                continue
+
             item = {
                 'id': story['id'],
                 'title': title,
