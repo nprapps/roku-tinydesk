@@ -221,8 +221,8 @@ function _GridScreen_initLists()
             this._lists[this.WATCHED].push(contentItem)
         end if
 
-        if contentItem["greatestHit"] then
-            this._lists[this.HITS].push(contentItem)
+        if contentItem["greatestHit"] <> invalid then
+            this._lists[this.HITS][contentItem["greatestHit"]] = contentItem
         end if
 
         if i < this.NEW_LIST_LENGTH then

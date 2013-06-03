@@ -84,7 +84,7 @@ def main():
                 'streamQualities': [],
                 'isHD': True,
                 'hdBranded': True,
-                'greatestHit': story['id'] in greatest_hits
+                'greatestHit': None 
             }
 
             alt_image_url = story['multimedia'][0]['altImageUrl']['$text']
@@ -99,6 +99,11 @@ def main():
 
             item['tempDate'] = dt
             item['releaseDate'] = dt.strftime('%B ') + dt.strftime('%d, ').lstrip('0') + dt.strftime('%Y') 
+
+            try:
+                item['greatestHit'] = greatest_hits.index(story['id'])
+            except ValueError:
+                pass
 
             if 'mp4' not in story['multimedia'][0]['format']:
                 logging.debug('--> No mp4 video, skipping!')
