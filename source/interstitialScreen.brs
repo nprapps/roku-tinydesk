@@ -36,32 +36,35 @@ function InterstitialScreen_show(nextContentItem, previousContentItem)
     halfHeight = height / 2
     
     fonts = createObject("roFontRegistry")
-    font = fonts.getDefaultFont(28, true, false)
 
     lines = []
 
     if previousContentItem <> invalid then
-        lines.push("Just played:")
+        lines.push("Just Played")
         lines.push(previousContentItem.title)
         lines.push("")
     end if
 
-    lines.push("Up next:")
+    lines.push("Up Next")
     lines.push(nextContentItem.title)
 
     lines.push("")
     lines.push("")
     lines.push("Press Back or Up to return to the menu")
 
-    h = font.getOneLineHeight()
-    yOffset = halfHeight - ((h * lines.count()) / 2)
-
     for i = 0 to lines.count() - 1
         line = lines[i]
+        if line = "Just Played" or line = "Up Next" then
+            font = fonts.getDefaultFont(28, true, false)
+        else
+            font = fonts.getDefaultFont(28, false, false)
+        endif
+        h = font.getOneLineHeight() + 3
+        yOffset = halfHeight - ((h * lines.count()) / 2)
         x = halfWidth - (font.getOneLineWidth(line, width) / 2)
         y = yOffset + (h * i)
 
-        screen.drawText(line, x, y, &hEBEBEBFF, font) 
+        screen.drawText(line, x, y, &hEBEBEBFF, font)
     end for
 
     screen.finish()
