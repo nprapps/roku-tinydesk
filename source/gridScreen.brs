@@ -95,9 +95,9 @@ function GridScreen_run()
 
                 watchNext:
 
-                watched = this._watch(contentItem, this._titles[selected_list], searchTerm)
+                finished = this._watch(contentItem, this._titles[selected_list], searchTerm)
                 
-                if watched and selected_item < this._lists[selected_list].count() - 1 then
+                if finished and selected_item < this._lists[selected_list].count() - 1 then
                     selected_item = selected_item + 1
                     previousContentItem = contentItem
                     contentItem = this._lists[selected_list][selected_item]
@@ -127,12 +127,12 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
 
     this = m
 
-    watched = this._videoScreen.play(contentItem, fromList, searchTerm)
+    finished = this._videoScreen.play(contentItem, fromList, searchTerm)
     lastWatched = contentItem["lastWatched"] 
-    setLastWatched(contentItem)
+    contentItem["lastWatched"] = setLastWatched(contentItem)
 
-    if watched then
-        markAsWatched(contentItem)
+    if finished then
+        markAsFinished(contentItem)
     end if
 
     if lastWatched = invalid then
@@ -160,7 +160,7 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
     this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
     this._screen.setFocusedListItem(this.WATCHED, 0)
 
-    return watched
+    return finished 
 
 end function
 

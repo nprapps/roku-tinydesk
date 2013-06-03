@@ -17,6 +17,8 @@ function setLastWatched(contentItem)
     now = createObject("roDateTime").asSeconds().toStr()
     RegWrite(contentItem.id, now, "recent")
 
+    return now.toInt()
+
 end function
 
 ' Get the timestamp the  video was last watched
@@ -33,14 +35,14 @@ function getLastWatched(contentItem)
 end function
 
 ' Mark a video watched in the registry
-function markAsWatched(contentItem)
+function markAsFinished(contentItem)
 
     RegWrite(contentItem.id, "true", "watched")
 
 end function
 
 ' Check the registry to see if a feed item has been watched
-function isWatched(contentItem) as Boolean
+function isFinished(contentItem) as Boolean
 
     read = RegRead(contentItem.id, "watched")
 
