@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ $# -ne 1 ]
+then
+    echo "Usage: `basename $0` {version}"
+    exit
+fi
+
 APP_NAME="roku-tinydesk"
 VERSION="$1"
 PKG_NAME="$APP_NAME-$VERSION"
