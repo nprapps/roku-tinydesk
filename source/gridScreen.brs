@@ -57,9 +57,16 @@ function GridScreen() as Object
     this._screen.showMessage("Retrieving...")
 
     this._feed = fetchFeed()
-    this._initLists()
 
-    this._screen.ClearMessage()
+    if this._feed = invalid then
+        this._screen.showMessage("Service unavailable. Please try again later.")
+
+        globals = getGlobalAA()
+        globals.analytics.trackEvent("Tiny Desk", "Feed Unavailable", "", "", [])
+    else
+        this._initLists()
+        this._screen.ClearMessage()
+    endif
 
     return this
 

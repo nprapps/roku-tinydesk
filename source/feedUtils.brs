@@ -5,7 +5,11 @@
 ' Fetch and parse the video feed
 function fetchFeed() as Object 
 
-    feed = httpGetWithRetry("http://apps.npr.org/roku-tinydesk/feed.json")
+    feed = httpGetWithRetry("http://apps.npr.org/roku-tinydesk/feed.json", 3000, 3)
+
+    if feed = "" then
+        return invalid
+    endif
 
     return ParseJSON(feed)
 
