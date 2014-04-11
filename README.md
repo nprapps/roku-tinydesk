@@ -10,10 +10,11 @@ Setup
 
 Put your Roku into [Dev Mode](http://sdkdocs.roku.com/display/RokuSDKv48/Developer+Guide#DeveloperGuide-71EnablingDevelopmentModeonyourbox).
 
-Your Roku will tell you its IP address when you put it into Dev Mode. Set it in your `.bash_profile`:
+Your Roku will tell you its IP address and have you set a developer password. Set these in your `.bash_profile`:
 
 ```
 export ROKU_IP="10.0.1.2"
+export ROKU_PASSWORD="mypassword"
 ```
 
 Install the Python requirements:
@@ -79,7 +80,7 @@ Your password will be print out: **save it**. Exit the telnet session by typing 
 Add this new password to your `~/.bash_profile`:
 
 ```
-export ROKU_PASSWORD="YOUR_PASSWORD_HERE"
+export ROKU_GENKEY_PASSWORD="YOUR_PASSWORD_HERE"
 ```
 
 Now to generate a shippable zip, simply run:
