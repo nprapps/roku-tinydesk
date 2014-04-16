@@ -76,7 +76,7 @@ def main():
                 'description': strip_tags(story['miniTeaser']['$text']),
                 'sdPosterUrl': None,
                 'hdPosterUrl': None,
-                'length': int(story['multimedia'][0]['duration']['$text']),
+                'length': int(story['multimedia'][0]['duration'].get('$text', 0)),
                 'releaseDate': None,
                 'streamFormat': 'mp4',
                 'streamBitrates': [],
