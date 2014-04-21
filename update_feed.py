@@ -42,6 +42,10 @@ def main():
         reader = csv.reader(f)
         greatest_hits = [row[1].strip() for row in reader]
 
+    with open('skip_list.txt') as f:
+        reader = csv.reader(f)
+        skip_list = [row[1].strip() for row in reader]
+
     output = []
     page = 0
 
@@ -63,6 +67,11 @@ def main():
             title = story['title']['$text'].replace(': Tiny Desk Concert', '')
             logging.debug(title)
 
+            # Skip any story we've added to the skip list
+            if story['id'] in skip_list:
+                logging.info('--> In skip list, skipping!')
+                continue
+
             if 'multimedia' not in story or len(story['multimedia']) == 0:
                 logging.info('--> No multimedia element, skipping!')
                 continue
@@ -76,7 +85,7 @@ def main():
                 'description': strip_tags(story['miniTeaser']['$text']),
                 'sdPosterUrl': None,
                 'hdPosterUrl': None,
-                'length': int(story['multimedia'][0]['duration']['$text']),
+                'length': int(story['multimedia'][0]['duration'].get('$text', 0)),
                 'releaseDate': None,
                 'streamFormat': 'mp4',
                 'streamBitrates': [],
