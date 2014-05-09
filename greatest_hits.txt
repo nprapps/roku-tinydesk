@@ -1,15 +1,19 @@
-Wilco,141331825
-Adele,133687905
-Macklemore & Ryan Lewis,166256822
-Miguel,167559983
-The xx,171475240
-Lyle Lovett,166752674
-Nicola Benedetti,180608832
-Passion Pit,163656642
-Alt-J,167447820
-Night Beds,172002889
-Black Prairie,168897017
-Anais Mitchell,166566464
-Efterklang,176568132
+Courtney Barnett,302900658
+Asaf Avidan,283953758
+Cate Le Bon,279061676
+Fanfare Ciocarlia,272092768
+Dessa,249016526
+John Legend,245218626
+Ashley Monroe,241888300
+San Fermin,240733267
+Valerie June,231507041
+Mother Falcon,212633651
 The Lone Bellow,173422704
 Lucius,168632210
+Macklemore & Ryan Lewis,166256822
+Passion Pit,163656642
+The Zombies,158576605
+Laura Marling,156301228
+Reggie Watts,155311057
+Pedro Soler And Gaspar Claus,152287034
+Kishi Bashi,152285927
