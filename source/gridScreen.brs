@@ -163,6 +163,10 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
     ' Add vid to watched list
     this._lists[this.WATCHED].unshift(contentItem)
 
+    if this._lists[this.WATCHED].count() > 0 then
+        this._screen.setListVisible(this.WATCHED, true)
+    end if
+
     this._screen.setContentList(this.UNWATCHED, this._lists[this.UNWATCHED])
     this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
     this._screen.setFocusedListItem(this.WATCHED, 0)
@@ -250,6 +254,10 @@ function _GridScreen_initLists()
         this._screen.setContentList(i, this._lists[i])
         this._screen.setFocusedListItem(i, 0)
     end for
+
+    if this._lists[this.WATCHED].count() = 0 then
+        this._screen.setListVisible(this.WATCHED, false)
+    end if
 
     this._screen.setFocusedListItem(this.NEW, 0)
 
