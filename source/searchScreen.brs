@@ -37,7 +37,7 @@ function SearchScreen_search(feed)
     this._screen.setSearchButtonText("search")
     this._screen.setClearButtonEnabled(false)
     
-    this._screen.Show() 
+    this._screen.show() 
 
     while true 
         msg = wait(0, this._port) 
@@ -49,13 +49,30 @@ function SearchScreen_search(feed)
                 history.Clear()
             else if msg.isPartialResult()
                 this._query = msg.GetMessage()
-                this._screen.SetSearchTerms(this._getSuggestions())
+
+                if len(this._query) = 0 then
+                    dialog = createObject("roOneLineDialog")
+                    dialog.setTitle("No results found.")
+                    dialog.show()
+                    sleep(2500)
+                    dialog.close()
+                else
+                    this._screen.SetSearchTerms(this._getSuggestions())
+                end if
             else if msg.isFullResult()
                 this._query = msg.GetMessage()
 
-                globals.analytics.trackEvent("Tiny Desk", "Search", this._query, "", [])
-
-                exit while
+                if len(this._query) = 0 then
+                    dialog = createObject("roOneLineDialog")
+                    dialog.setTitle("No results found.")
+                    dialog.show()
+                    sleep(2500)
+                    dialog.close()
+                else
+                    globals.analytics.trackEvent("Tiny Desk", "Search", this._query, "", [])
+                
+                    exit while
+                end if
             endif
         endif
     endwhile 
