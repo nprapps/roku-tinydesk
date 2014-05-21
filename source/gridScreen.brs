@@ -180,6 +180,7 @@ function _GridScreen_search()
 
     this = m
 
+    this._beginWrapper()
     this._searchScreen.search(this._feed)
 
     this._lists[this.SEARCH] = this._searchScreen.getMatches()
@@ -203,13 +204,13 @@ function _GridScreen_search()
     ' One result
     else if this._lists[this.SEARCH].count() = 2 then
         contentItem = this._lists[this.SEARCH][1]
-        this._beginWrapper()
         this._watch(contentItem, this._titles[this.SEARCH], this._lastSearch)
-        this._endWrapper()
     ' Multiple results
     else
         this._screen.setFocusedListItem(this.SEARCH, 1)
     end if
+
+    this._endWrapper()
 
 end function
 

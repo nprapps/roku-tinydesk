@@ -10,6 +10,7 @@ function SearchScreen() as Object
     
     ' Member functions
     this.search = SearchScreen_search
+    this.noQuery = _SearchScreen_noQuery
     this.getMatches = SearchScreen_getMatches
     this.getQuery = SearchScreen_getQuery
     this.close = SearchScreen_close
@@ -51,11 +52,7 @@ function SearchScreen_search(feed)
                 this._query = msg.GetMessage()
 
                 if len(this._query) = 0 then
-                    dialog = createObject("roOneLineDialog")
-                    dialog.setTitle("No results found.")
-                    dialog.show()
-                    sleep(2500)
-                    dialog.close()
+                    this.noQuery()
                 else
                     this._screen.SetSearchTerms(this._getSuggestions())
                 end if
@@ -63,11 +60,7 @@ function SearchScreen_search(feed)
                 this._query = msg.GetMessage()
 
                 if len(this._query) = 0 then
-                    dialog = createObject("roOneLineDialog")
-                    dialog.setTitle("No results found.")
-                    dialog.show()
-                    sleep(2500)
-                    dialog.close()
+                    this.noQuery()
                 else
                     globals.analytics.trackEvent("Tiny Desk", "Search", this._query, "", [])
                 
@@ -78,6 +71,16 @@ function SearchScreen_search(feed)
     endwhile 
 
     'this._screen.close()
+
+end function
+
+function _SearchScreen_noQuery()
+
+    dialog = createObject("roOneLineDialog")
+    dialog.setTitle("Please enter a search query.")
+    dialog.show()
+    sleep(2500)
+    dialog.close()
 
 end function
 
