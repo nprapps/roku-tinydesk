@@ -44,8 +44,8 @@ $ s3cmd --configure
 To generate (and deploy) the Tiny Desk API feed:
 
 ```
-$ workon roku-tinydesk 
-$ ./fetch_feed.py
+$ workon roku-tinydesk
+$ ./update_feed.py
 ```
 
 Package & Deploy
@@ -120,7 +120,7 @@ The following events are tracked in Google Analytics:
 
 **Notes**:
 
-* The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. As a result, `sessionDuration` will always be approximate. 
+* The *Shutdown* action isn't recorded until the next time the application is run, because there is no reliable shutdown event in a Roku app. As a result, `sessionDuration` will always be approximate.
 * The *Stop* action is reported alongside the *Finish* action when a video is completed, for purposes of tracking playtimes.
 * There is no concept of a *ping* in this event model, so users will appear inactive on the Google Analytics dashboard while in the middle of a long video or sitting on a menu. Their `sessionDuration` recorded in the *Shutdown* event will correctly include the this time.
 * The *Feed Unavailable* action occurs if the `feed.json` file can not be downloaded from S3 after several attempts. (Do to an error or poor connectivity.)
