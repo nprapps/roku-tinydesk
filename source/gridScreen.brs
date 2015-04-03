@@ -7,7 +7,7 @@ function GridScreen() as Object
 
     ' Member vars
     this = {}
-    
+
     this.NEW = 0
     this.HITS = 1
     this.UNWATCHED = 2
@@ -28,14 +28,14 @@ function GridScreen() as Object
     this._screen = createObject("roGridScreen")
     this._videoScreen = VideoScreen()
     this._searchScreen = SearchScreen()
-    this._interstitialScreen = InterstitialScreen() 
+    this._interstitialScreen = InterstitialScreen()
     this._wrapper = invalid
 
     this._feed = []
     this._titles = ["New", "Editor's Picks", "Unwatched", "Watched", "Search"]
     this._lists = []
     this._lastSearch = ""
-    
+
     ' Member functions
     this.run = GridScreen_run
     this._watch = _GridScreen_watch
@@ -49,7 +49,7 @@ function GridScreen() as Object
 
     this._screen.setGridStyle("four-column-flat-landscape")
     this._screen.setDisplayMode("photo-fit")
-    
+
     ' Always setup at least one list (keeps tooltips from appearing in the wrong place)
     this._screen.setupLists(1)
 
@@ -93,7 +93,7 @@ function GridScreen_run()
                 this._search()
             else
                 this._beginWrapper()
-                
+
                 if selected_list = this.SEARCH
                     searchTerm = this._lastSearch
                 else
@@ -103,19 +103,19 @@ function GridScreen_run()
                 watchNext:
 
                 finished = this._watch(contentItem, this._titles[selected_list], searchTerm)
-                
+
                 if finished and selected_item < this._lists[selected_list].count() - 1 then
                     selected_item = selected_item + 1
                     previousContentItem = contentItem
                     contentItem = this._lists[selected_list][selected_item]
-                    
+
                     playNext = this._interstitialScreen.show(contentItem, previousContentItem)
-                    
+
                     if playNext then
                         goto watchNext
                     end if
                 end if
-    
+
                 this._endWrapper()
             end if
         else if msg.isRemoteKeyPressed() then
@@ -135,7 +135,7 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
     this = m
 
     finished = this._videoScreen.play(contentItem, fromList, searchTerm)
-    lastWatched = contentItem["lastWatched"] 
+    lastWatched = contentItem["lastWatched"]
     contentItem["lastWatched"] = setLastWatched(contentItem)
 
     if finished then
@@ -162,24 +162,15 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
 
     ' Add vid to watched list
     this._lists[this.WATCHED].unshift(contentItem)
-    
+    this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
+
     if this._lists[this.WATCHED].count() = 1 then
-        this._screen.setupLists(this._titles.count())
-        this._screen.setListNames(this._titles)
-
-        for i = 0 to this._lists.count() - 1
-            this._screen.setContentList(i, this._lists[i])
-            this._screen.setFocusedListItem(i, 0)
-        end for
-
         this._screen.setListVisible(this.WATCHED, true)
-    else    
-        this._screen.setContentList(this.WATCHED, this._lists[this.WATCHED])
     end if
 
     this._screen.setFocusedListItem(this.WATCHED, 0)
 
-    return finished 
+    return finished
 
 end function
 
@@ -199,9 +190,9 @@ function _GridScreen_search()
     if this._lists[this.SEARCH].count() = 1 then
         this._screen.setListName(this.SEARCH, "Search")
     else
-        this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._lastSearch + chr(34)) 
+        this._screen.setListName(this.SEARCH, "Search results for " + chr(34) + this._lastSearch + chr(34))
     end if
-    
+
     this._screen.setContentList(this.SEARCH, this._lists[this.SEARCH])
 
     this._searchScreen.close()
@@ -232,7 +223,7 @@ function _GridScreen_initLists()
     end for
 
     for i = 0 to this._feed.count() - 1
-        contentItem = this._feed[i] 
+        contentItem = this._feed[i]
         contentItem["lastWatched"] = getLastWatched(contentItem)
 
         if contentItem["lastWatched"] = invalid then
@@ -249,7 +240,7 @@ function _GridScreen_initLists()
             this._lists[this.NEW].push(contentItem)
         end if
     end for
-    
+
     sortBy(this._lists[this.WATCHED], "lastWatched", False)
     this._lists[this.SEARCH] = [this.SEARCH_ITEM]
 
@@ -291,4 +282,3 @@ function _GridScreen_endWrapper()
     this._wrapper = invalid
 
 end function
-
