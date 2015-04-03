@@ -147,6 +147,7 @@ function _GridScreen_watch(contentItem, fromList, searchTerm)
         for i = 0 to this._lists[this.UNWATCHED].count() - 1
             if this._lists[this.UNWATCHED][i].id = contentItem.id then
                 this._lists[this.UNWATCHED].delete(i)
+                this._screen.setContentList(this.UNWATCHED, this._lists[this.UNWATCHED])
                 exit for
             end if
         end for
