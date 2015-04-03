@@ -13,7 +13,6 @@ function Main()
     globals.lastAdTimestamp = 0
 
     reg = createObject("roRegistry")
-    reg.delete("recent")
 
     print "Starting up"
     globals.analytics.startup()
