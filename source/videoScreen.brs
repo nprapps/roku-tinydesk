@@ -2,12 +2,12 @@
 ' Video playback screen
 '
 
-' Video screen constructor 
+' Video screen constructor
 function VideoScreen()
 
     ' Member vars
     this = {}
-    
+
     ' Member functions
     this.play = VideoScreen_play
     this._playAd = _VideoScreen_playAd
@@ -30,18 +30,40 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
 
     adPlayed = false
 
-    if globals.USE_ADS and position = 0 and globals.firstPlay = false and timestamp - globals.lastAdTimestamp > globals.TIME_BETWEEN_ADS 
-        adComplete = this._playAd()
-
-        if not adComplete
-            return false
-        end if
-
-        adPlayed = true
-
-        globals.lastAdTimestamp = timestamp
+    if globals.FORCE_ADS:
+        goto playAd
     end if
-    
+
+    if globals.USE_ADS = false:
+        goto skipAd
+    end if
+
+    if position <> 0:
+        goto skipAd
+    end if
+
+    if globals.firstPlay = true:
+        goto skipAd
+    end if
+
+    if timestamp - globals.lastAdTimestamp < globals.TIME_BETWEEN_ADS:
+        goto skipAd
+    end if
+
+    playAd:
+
+    adComplete = this._playAd()
+
+    if not adComplete
+        return false
+    end if
+
+    adPlayed = true
+
+    globals.lastAdTimestamp = timestamp
+
+    skipAd:
+
     ' Users get to skip one ad for free
     globals.firstPlay = false
 
@@ -51,7 +73,7 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
         globals.analytics.trackEvent("Tiny Desk", "Start", contentItem.Title, "", [{ name: "fromList", value: fromList }, { name: "searchTerm", value: searchTerm }])
     end if
 
-    print "Video playback will begin at: " position 
+    print "Video playback will begin at: " position
 
     this._port = createObject("roMessagePort")
     this._screen = createObject("roVideoScreen")
@@ -119,7 +141,7 @@ function _VideoScreen_playAd()
 
     timestamp = createObject("roDateTime").asSeconds()
 
-    data = httpGetWithRetry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&correlator=" + timestamp.toStr(), 2000, 0)
+    data = httpGetWithRetry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.nprtest/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&correlator=" + timestamp.toStr(), 2000, 0)
 
     if data = ""
         print "VAST response was empty or request failed."
@@ -134,8 +156,7 @@ function _VideoScreen_playAd()
         return true
     end if
 
-    mp4 = invalid
-    bitrate = invalid
+    videos = []
 
     media = vast.Ad.InLine.Creatives.Creative.Linear.MediaFiles.MediaFile
 
@@ -144,16 +165,29 @@ function _VideoScreen_playAd()
         return true
     end if
 
+    streamQualities = []
+    streamBitrates = []
+    streamUrls = []
+
     for each video in media
         if video@type = "video/mp4"
             mp4 = video.getText()
-            bitrate = video@bitrate
-            exit for
+            height = (video@height).toInt()
+            bitrate = (video@bitrate).toInt()
+
+            if height >= 720:
+                streamQualities.push("HD")
+            else:
+                streamQualities.push("SD")
+            end if
+
+            streamBitrates.push(bitrate)
+            streamUrls.push(mp4)
         end if
     end for
 
     if mp4 = invalid
-        print "VAST did not contain an MP4 video url." 
+        print "VAST did not contain an MP4 video url."
         return true
     end if
 
@@ -185,10 +219,10 @@ function _VideoScreen_playAd()
 
     this._player.setDestinationRect(this._canvas.getCanvasRect())
     this._player.addContent({
-        streamQualities: ["SD"],
-        streamBitrates: [bitrate],
+        streamQualities: streamQualities,
+        streamBitrates: streamBitrates,
         streamFormat: "mp4",
-        streamUrls: [mp4]
+        streamUrls: streamUrls
     })
     this._player.play()
     paused = false
@@ -210,9 +244,9 @@ function _VideoScreen_playAd()
             this._canvas.setLayer(0, { color: "#14141400", compositionMode: "source" })
             ' Docs say setLayer does this anyway?
             this._canvas.show()
-            
+
             httpGetWithRetry(impression_url, 2000, 0)
-            
+
             for each url in start_urls
                 httpGetWithRetry(url, 2000, 0)
             end for
@@ -244,4 +278,3 @@ function _VideoScreen_playAd()
     return adComplete
 
 end function
-

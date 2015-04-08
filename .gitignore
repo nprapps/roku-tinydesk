@@ -6,3 +6,4 @@ feed.json
 missing_mp4s.txt
 zero_length.txt
 *.pyc
+RokuSDK
