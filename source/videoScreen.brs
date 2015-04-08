@@ -269,8 +269,20 @@ function _VideoScreen_playAd()
             end if
         else if msg.isPaused()
             paused = true
+
+            for each url in eventUrls["pause"]
+                httpGetWithRetry(url, 2000, 0)
+            end for
         else if msg.isResumed()
             paused = false
+
+            for each url in eventUrls["resume"]
+                httpGetWithRetry(url, 2000, 0)
+            end for
+        else if msg.isPlaybackPosition() then
+            position = msg.getIndex()
+
+            ' TODO: track quartile events
         end if
     end while
 
