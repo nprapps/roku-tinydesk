@@ -192,17 +192,19 @@ function _VideoScreen_playAd()
     end if
 
     impression_url = vast.Ad.Inline.Impression.getText()
-    start_urls = []
-    complete_urls = []
+
+    eventUrls = createObject("roAssociativeArray")
 
     events = vast.Ad.Inline.Creatives.Creative.Linear.TrackingEvents.Tracking
 
     for each event in events
-        if event@event = "start" then
-            start_urls.push(event.getText())
-        else if event@event = "complete" then
-            complete_urls.push(event.getText())
+        name = event@event
+
+        if eventUrls.DoesExist(name) = false then
+            eventUrls[name] = []
         end if
+
+        eventUrls[name].push(event.getText())
     end for
 
     this._port = createObject("roMessagePort")
@@ -234,7 +236,7 @@ function _VideoScreen_playAd()
             adComplete = false
             exit while
         else if msg.isFullResult()
-            for each url in complete_urls
+            for each url in eventUrls["complete"]
                 httpGetWithRetry(url, 2000, 0)
             end for
 
@@ -247,7 +249,7 @@ function _VideoScreen_playAd()
 
             httpGetWithRetry(impression_url, 2000, 0)
 
-            for each url in start_urls
+            for each url in eventUrls["start"]
                 httpGetWithRetry(url, 2000, 0)
             end for
 
