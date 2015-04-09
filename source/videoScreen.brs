@@ -196,6 +196,13 @@ function _VideoScreen_playAd()
     eventUrls = createObject("roAssociativeArray")
 
     events = vast.Ad.Inline.Creatives.Creative.Linear.TrackingEvents.Tracking
+    duration = vast.Ad.Inline.Creatives.Creative.Linear.Duration.getText()
+    bits = duration.tokenize(":")
+    duration = (bits[0].toInt() * 60 * 60) + (bits[1].toInt() * 60) + bits[2].toInt()
+
+    reachedFirstQuartile = false
+    reachedMidpoint = false
+    reachedThirdQuartile = false
 
     for each event in events
         name = event@event
@@ -219,6 +226,7 @@ function _VideoScreen_playAd()
 
     adComplete = true
 
+    this._player.setPositionNotificationPeriod(1)
     this._player.setDestinationRect(this._canvas.getCanvasRect())
     this._player.addContent({
         streamQualities: streamQualities,
@@ -282,7 +290,29 @@ function _VideoScreen_playAd()
         else if msg.isPlaybackPosition() then
             position = msg.getIndex()
 
-            ' TODO: track quartile events
+            if position > duration * 0.25 and reachedFirstQuartile = false then
+                for each url in eventUrls["firstQuartile"]
+                    httpGetWithRetry(url, 2000, 0)
+                end for
+
+                reachedFirstQuartile = true
+            end if
+
+            if position > duration * 0.5 and reachedMidpoint = false then
+                for each url in eventUrls["midpoint"]
+                    httpGetWithRetry(url, 2000, 0)
+                end for
+
+                reachedMidpoint = true
+            end if
+
+            if position > duration * 0.75 and reachedThirdQuartile = false then
+                for each url in eventUrls["thirdQuartile"]
+                    httpGetWithRetry(url, 2000, 0)
+                end for
+
+                reachedThirdQuartile = true
+            end if
         end if
     end while
 
