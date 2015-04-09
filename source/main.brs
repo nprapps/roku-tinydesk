@@ -8,7 +8,7 @@ function Main()
 
     globals.analytics = Analytics()
     globals.USE_ADS = true
-    globals.FORCE_ADS = true
+    globals.FORCE_ADS = false
     globals.TIME_BETWEEN_ADS = 60 * 60
     globals.firstPlay = true
     globals.lastAdTimestamp = 0

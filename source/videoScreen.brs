@@ -26,6 +26,13 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
     position = loadPosition(contentItem)
     contentItem.playStart = position
 
+    duration = contentItem.length
+
+    ' Prevent events being recorded again after resume
+    reachedFirstQuartile = (position > duration * 0.25)
+    reachedMidpoint = (position > duration * 0.5)
+    reachedThirdQuartile = (position > duration * 0.75)
+
     timestamp = createObject("roDateTime").asSeconds()
 
     adPlayed = false
@@ -100,6 +107,7 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
 
             globals.analytics.trackEvent("Tiny Desk", "Stop", contentItem.title, playtime.toStr(), [{ name: "stoppedAtPct", value: "100" }])
             globals.analytics.trackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
+            globals.analytics.trackEvent("Tiny Desk", "Completion", "100", "", [])
 
             exit while
         else if msg.isPartialResult()
@@ -120,11 +128,30 @@ function VideoScreen_play(contentItem, fromList="", searchTerm="") as Boolean
 
                 watched = True
                 globals.analytics.trackEvent("Tiny Desk", "Finish", contentItem.title, "", [])
+                globals.analytics.trackEvent("Tiny Desk", "Completion", "100", "", [])
             end if
         else if msg.isPlaybackPosition() then
             position = msg.getIndex()
 
             savePosition(contentItem, position)
+
+            if position > duration * 0.25 and reachedFirstQuartile = false then
+                globals.analytics.trackEvent("Tiny Desk", "Completion", "25", "", [])
+
+                reachedFirstQuartile = true
+            end if
+
+            if position > duration * 0.5 and reachedMidpoint = false then
+                globals.analytics.trackEvent("Tiny Desk", "Completion", "50", "", [])
+
+                reachedMidpoint = true
+            end if
+
+            if position > duration * 0.75 and reachedThirdQuartile = false then
+                globals.analytics.trackEvent("Tiny Desk", "Completion", "75", "", [])
+
+                reachedThirdQuartile = true
+            end if
         end if
     end while
 
