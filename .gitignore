@@ -7,3 +7,4 @@ missing_mp4s.txt
 zero_length.txt
 *.pyc
 RokuSDK
+images/.DS_Store
