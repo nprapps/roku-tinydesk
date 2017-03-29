@@ -82,7 +82,7 @@ def main():
                 'searchTitle': searchify_title(title), 
                 'sortTitle': sortify_title(title), 
                 'titleSeason': 'Tiny Desk Concerts',
-                'description': strip_tags(story['miniTeaser']['$text']),
+                'description': strip_tags(story['miniTeaser'].get('$text', '')),
                 'sdPosterUrl': None,
                 'hdPosterUrl': None,
                 'length': int(story['multimedia'][0]['duration'].get('$text', 0)),
