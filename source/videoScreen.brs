@@ -169,7 +169,6 @@ function _VideoScreen_playAd()
     timestamp = createObject("roDateTime").asSeconds()
 
     data = httpGetWithRetry("http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=/6735/n6735.npr/roku&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&correlator=" + timestamp.toStr(), 2000, 0)
-atom
     if data = ""
         print "VAST response was empty or request failed."
         return true
